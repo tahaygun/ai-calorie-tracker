@@ -13,8 +13,6 @@ interface SettingsContextType {
   setCustomModelName: (name: string) => void;
   debugMode: boolean;
   setDebugMode: (debug: boolean) => void;
-  showApiKeyPrompt: boolean;
-  setShowApiKeyPrompt: (prompt: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -25,7 +23,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const [customModelName, setCustomModelName] = useState('');
   const [debugMode, setDebugMode] = useState(false);
-  const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(true);
 
   // Initialize values from localStorage
   useEffect(() => {
@@ -40,7 +37,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSelectedModel(storedModel);
     setCustomModelName(storedCustomModel);
     setDebugMode(storedDebugMode);
-    setShowApiKeyPrompt(!storedApiKey);
   }, []);
 
   // Save settings whenever they change
@@ -65,8 +61,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setCustomModelName,
         debugMode,
         setDebugMode,
-        showApiKeyPrompt,
-        setShowApiKeyPrompt,
       }}
     >
       {children}

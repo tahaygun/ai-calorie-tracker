@@ -34,7 +34,6 @@ export default function Home() {
     selectedModel,
     customModelName,
     debugMode,
-    showApiKeyPrompt,
     setApiKey,
     setTargetCalories,
     setSelectedModel,
@@ -129,7 +128,7 @@ export default function Home() {
           </button>
         </div>
 
-        {showApiKeyPrompt && <SettingsPrompt type='apiKey' onOpenSettings={() => setIsSettingsOpen(true)} />}
+        {!apiKey && <SettingsPrompt type='apiKey' onOpenSettings={() => setIsSettingsOpen(true)} />}
         {!targetCalories && <SettingsPrompt type='calorieTarget' onOpenSettings={() => setIsSettingsOpen(true)} />}
 
         <MealForm
