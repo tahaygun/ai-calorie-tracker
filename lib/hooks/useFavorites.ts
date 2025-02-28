@@ -4,18 +4,20 @@ import { useEffect, useState } from 'react';
 import type { MealEntry } from '../types';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<MealEntry[]>(null);
+  const [favorites, setFavorites] = useState<MealEntry[]>([]);
+  const [firstLoad, setFirstLoad] = useState(true);
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem('favorite_meals');
-    setFavorites(JSON.parse(storedFavorites) || []);
+    setFavorites(JSON.parse(storedFavorites || '[]'));
+    setFirstLoad(false);
   }, []);
 
   useEffect(() => {
-    if (favorites) {
+    if (!firstLoad) {
       localStorage.setItem('favorite_meals', JSON.stringify(favorites));
     }
-  }, [favorites]);
+  }, [favorites, firstLoad]);
 
   const toggleFavorite = (meal: MealEntry) => {
     const isFavorite = favorites.some((fav) => fav.id === meal.id);

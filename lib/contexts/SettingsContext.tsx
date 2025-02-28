@@ -20,43 +20,28 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [apiKey, setApiKey] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('openai_api_key') || '';
-    }
-    return '';
-  });
+  const [apiKey, setApiKey] = useState('');
+  const [targetCalories, setTargetCalories] = useState(0);
+  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [customModelName, setCustomModelName] = useState('');
+  const [debugMode, setDebugMode] = useState(false);
+  const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(true);
 
-  const [targetCalories, setTargetCalories] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('target_calories');
-      return stored ? parseInt(stored) : 0;
-    }
-    return 0;
-  });
+  // Initialize values from localStorage
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem('openai_api_key') || '';
+    const storedCalories = localStorage.getItem('target_calories');
+    const storedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
+    const storedCustomModel = localStorage.getItem('custom_model') || '';
+    const storedDebugMode = localStorage.getItem('debug_mode') === 'true';
 
-  const [selectedModel, setSelectedModel] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('selected_model') || 'gpt-4o-mini';
-    }
-    return 'gpt-4o-mini';
-  });
-
-  const [customModelName, setCustomModelName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('custom_model') || '';
-    }
-    return '';
-  });
-
-  const [debugMode, setDebugMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('debug_mode') === 'true';
-    }
-    return false;
-  });
-
-  const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(() => !apiKey);
+    setApiKey(storedApiKey);
+    setTargetCalories(storedCalories ? parseInt(storedCalories) : 0);
+    setSelectedModel(storedModel);
+    setCustomModelName(storedCustomModel);
+    setDebugMode(storedDebugMode);
+    setShowApiKeyPrompt(!storedApiKey);
+  }, []);
 
   // Save settings whenever they change
   useEffect(() => {

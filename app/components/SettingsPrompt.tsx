@@ -1,3 +1,5 @@
+'use client';
+
 interface SettingsPromptProps {
   type: 'apiKey' | 'calorieTarget';
   onOpenSettings: () => void;
