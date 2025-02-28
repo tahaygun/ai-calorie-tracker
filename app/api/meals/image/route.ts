@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Image file is required' }, { status: 400 });
     }
 
+    // Convert file to base64
     const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
