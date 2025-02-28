@@ -1,3 +1,4 @@
+import { SettingsProvider } from '@/lib/contexts/SettingsContext';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import ClientLayout from './ClientLayout';
@@ -73,7 +74,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <ClientLayout>{children}</ClientLayout>
+        <SettingsProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </SettingsProvider>
       </body>
     </html>
   );

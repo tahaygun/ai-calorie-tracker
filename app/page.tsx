@@ -1,7 +1,10 @@
 'use client';
-import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
-import { useEffect, useState } from 'react';
-import type { MealEntry, NutritionTotals } from '../lib/types';
+import { useSettings } from '@/lib/contexts/SettingsContext';
+import { useFavorites } from '@/lib/hooks/useFavorites';
+import { useMeals } from '@/lib/hooks/useMeals';
+import { useNutritionApi } from '@/lib/hooks/useNutritionApi';
+import { useState } from 'react';
+import type { MealEntry } from '../lib/types';
 import CalorieProgress from './components/CalorieProgress';
 import FavoritesModal from './components/FavoritesModal';
 import MealForm from './components/MealForm';
@@ -11,81 +14,40 @@ import SettingsModal from './components/SettingsModal';
 import SettingsPrompt from './components/SettingsPrompt';
 
 export default function Home() {
-  const [mealDescription, setMealDescription] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [dailyMeals, setDailyMeals] = useState<MealEntry[]>([]);
-  const [editableItems, setEditableItems] = useState<FoodItemNutrition[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [favorites, setFavorites] = useState<MealEntry[]>([]);
+  const {
+    mealDescription,
+    setMealDescription,
+    dailyMeals,
+    editableItems,
+    setEditableItems,
+    isEditing,
+    setIsEditing,
+    calculateDailyTotals,
+    addMeal,
+    deleteMeal,
+    updateItemNutrition,
+  } = useMeals();
+
+  const {
+    apiKey,
+    targetCalories,
+    selectedModel,
+    customModelName,
+    debugMode,
+    showApiKeyPrompt,
+    setApiKey,
+    setTargetCalories,
+    setSelectedModel,
+    setCustomModelName,
+    setDebugMode,
+  } = useSettings();
+
+  const { favorites, toggleFavorite, deleteFavorite, isMealFavorite } = useFavorites();
+  const { isLoading, tokenUsage, analyzeMealDescription, analyzeMealImage, clearTokenUsage } = useNutritionApi();
+
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
-  const [targetCalories, setTargetCalories] = useState(0);
-  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
-  const [customModelName, setCustomModelName] = useState('');
-  const [debugMode, setDebugMode] = useState(false);
   const [resetImageUpload, setResetImageUpload] = useState(0);
-  const [tokenUsage, setTokenUsage] = useState<{
-    totalTokens: number;
-    promptTokens: number;
-    completionTokens: number;
-  } | null>(null);
-
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const storedMeals = localStorage.getItem(`meals_${today}`);
-    const storedApiKey = localStorage.getItem('openai_api_key');
-    const storedTargetCalories = localStorage.getItem('target_calories');
-    const storedModel = localStorage.getItem('selected_model');
-    const storedCustomModel = localStorage.getItem('custom_model');
-    const storedDebugMode = localStorage.getItem('debug_mode');
-    const storedFavorites = localStorage.getItem('favorite_meals');
-
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    } else {
-      setShowApiKeyPrompt(true);
-    }
-
-    if (storedTargetCalories) {
-      setTargetCalories(parseInt(storedTargetCalories));
-    }
-
-    if (storedMeals) {
-      setDailyMeals(JSON.parse(storedMeals));
-    }
-
-    if (storedModel) {
-      setSelectedModel(storedModel);
-    }
-
-    if (storedCustomModel) {
-      setCustomModelName(storedCustomModel);
-    }
-
-    if (storedDebugMode) {
-      setDebugMode(storedDebugMode === 'true');
-    }
-
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('openai_api_key', apiKey);
-    localStorage.setItem('target_calories', targetCalories.toString());
-    localStorage.setItem('selected_model', selectedModel);
-    localStorage.setItem('custom_model', customModelName);
-    localStorage.setItem('debug_mode', debugMode.toString());
-    localStorage.setItem('favorite_meals', JSON.stringify(favorites));
-  }, [apiKey, targetCalories, selectedModel, customModelName, debugMode, favorites]);
-
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem(`meals_${today}`, JSON.stringify(dailyMeals));
-  }, [dailyMeals]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,35 +55,14 @@ export default function Home() {
       setIsSettingsOpen(true);
       return;
     }
-    setIsLoading(true);
+
     try {
-      const response = await fetch('/api/meals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
-          'X-Debug-Mode': debugMode ? 'true' : 'false',
-        },
-        body: JSON.stringify({ description: mealDescription }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.nutritionData) {
-        setEditableItems(data.nutritionData);
-        setIsEditing(true);
-        if (data.debugInfo) {
-          setTokenUsage(data.debugInfo);
-        }
-      } else {
-        throw new Error(data.error || 'Failed to analyze meal');
-      }
+      const nutritionData = await analyzeMealDescription(mealDescription);
+      setEditableItems(nutritionData);
+      setIsEditing(true);
     } catch (error) {
       console.error('Error analyzing meal:', error);
       alert('Failed to analyze meal. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -130,42 +71,18 @@ export default function Home() {
       setIsSettingsOpen(true);
       return;
     }
-    setIsLoading(true);
+
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('description', mealDescription || 'Food image analysis');
-
-      const response = await fetch('/api/meals/image', {
-        method: 'POST',
-        headers: {
-          'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
-          'X-Debug-Mode': debugMode ? 'true' : 'false',
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.nutritionData) {
-        setEditableItems(data.nutritionData);
-        setIsEditing(true);
-        if (!mealDescription) {
-          const itemDescriptions = data.nutritionData.map((item: FoodItemNutrition) => item.item);
-          setMealDescription(itemDescriptions.join(', '));
-        }
-        if (data.debugInfo) {
-          setTokenUsage(data.debugInfo);
-        }
-      } else {
-        throw new Error(data.error || 'Failed to analyze image');
+      const nutritionData = await analyzeMealImage(file, mealDescription);
+      setEditableItems(nutritionData);
+      setIsEditing(true);
+      if (!mealDescription) {
+        const itemDescriptions = nutritionData.map((item) => item.item);
+        setMealDescription(itemDescriptions.join(', '));
       }
     } catch (error) {
       console.error('Error analyzing image:', error);
       alert('Failed to analyze image. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -176,28 +93,13 @@ export default function Home() {
       items: editableItems,
       timestamp: new Date().toISOString(),
     };
-    setDailyMeals((prev) => [...prev, newMeal]);
+    addMeal(newMeal);
     setMealDescription('');
     setEditableItems([]);
     setIsEditing(false);
-    setTokenUsage(null);
+    clearTokenUsage();
     setResetImageUpload((prev) => prev + 1);
   };
-
-  const handleDeleteMeal = (id: string) => {
-    setDailyMeals((prev) => prev.filter((meal) => meal.id !== id));
-  };
-
-  const toggleFavorite = (meal: MealEntry) => {
-    const isFavorite = favorites.some((fav) => fav.id === meal.id);
-    if (isFavorite) {
-      setFavorites((prev) => prev.filter((fav) => fav.id !== meal.id));
-    } else {
-      setFavorites((prev) => [...prev, meal]);
-    }
-  };
-
-  const isMealFavorite = (id: string) => favorites.some((fav) => fav.id === id);
 
   const handleSelectFavorite = (meal: MealEntry) => {
     const newMeal = {
@@ -205,53 +107,8 @@ export default function Home() {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
     };
-    setDailyMeals((prev) => [...prev, newMeal]);
+    addMeal(newMeal);
     setIsFavoritesOpen(false);
-  };
-
-  const handleDeleteFavorite = (id: string) => {
-    setFavorites((prev) => prev.filter((meal) => meal.id !== id));
-  };
-
-  const calculateDailyTotals = (): NutritionTotals => {
-    return dailyMeals.reduce(
-      (totals, meal) => {
-        const mealTotals = meal.items.reduce(
-          (itemTotals: NutritionTotals, item: FoodItemNutrition) => ({
-            calories: itemTotals.calories + item.nutrition.calories,
-            protein: itemTotals.protein + item.nutrition.protein,
-            carbs: itemTotals.carbs + item.nutrition.carbs,
-            fat: itemTotals.fat + item.nutrition.fat,
-            fiber: itemTotals.fiber + item.nutrition.fiber,
-          }),
-          { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-        );
-        return {
-          calories: totals.calories + mealTotals.calories,
-          protein: totals.protein + mealTotals.protein,
-          carbs: totals.carbs + mealTotals.carbs,
-          fat: totals.fat + mealTotals.fat,
-          fiber: totals.fiber + mealTotals.fiber,
-        };
-      },
-      { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-    );
-  };
-
-  const updateItemNutrition = (itemIndex: number, field: keyof NutritionData, value: number) => {
-    setEditableItems((items) =>
-      items.map((item, index) =>
-        index === itemIndex
-          ? {
-              ...item,
-              nutrition: {
-                ...item.nutrition,
-                [field]: value,
-              },
-            }
-          : item
-      )
-    );
   };
 
   return (
@@ -301,20 +158,20 @@ export default function Home() {
               onCancel={() => {
                 setIsEditing(false);
                 setEditableItems([]);
-                setTokenUsage(null);
+                clearTokenUsage();
               }}
             />
           </div>
         )}
 
-        <MealList meals={dailyMeals} onToggleFavorite={toggleFavorite} onDelete={handleDeleteMeal} isFavorite={isMealFavorite} />
+        <MealList meals={dailyMeals} onToggleFavorite={toggleFavorite} onDelete={deleteMeal} isFavorite={isMealFavorite} />
 
         <FavoritesModal
           isOpen={isFavoritesOpen}
           onClose={() => setIsFavoritesOpen(false)}
           favorites={favorites}
           onSelect={handleSelectFavorite}
-          onDelete={handleDeleteFavorite}
+          onDelete={deleteFavorite}
         />
 
         <SettingsModal

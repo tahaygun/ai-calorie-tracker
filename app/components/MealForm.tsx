@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 interface MealFormProps {
   mealDescription: string;
@@ -28,6 +28,11 @@ export default function MealForm({
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -73,6 +78,10 @@ export default function MealForm({
       await onSubmit(e);
     }
   };
+
+  if (!isMounted) {
+    return null; // or a loading state
+  }
 
   return (
     <form onSubmit={handleFormSubmit} className='space-y-3'>
