@@ -103,7 +103,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🔗 Links
 
-- [Live Demo](https://calorie-tracker-ai.vercel.app)
+- [Live Demo](https://ai-calorietracker.vercel.app)
 - [GitHub Repository](https://github.com/tahaygun/ai-calorie-tracker)
 - [Report Bug](https://github.com/tahaygun/ai-calorie-tracker/issues)
 - [Request Feature](https://github.com/tahaygun/ai-calorie-tracker/issues)

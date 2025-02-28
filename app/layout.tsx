@@ -15,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://calorie-tracker-ai.vercel.app'),
+  metadataBase: new URL('https://ai-calorietracker.vercel.app'),
   title: {
     default: 'Free AI Calorie Tracker - No Account Needed',
     template: '%s | Free AI Calorie Tracker',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Free AI Calorie Tracker - No Account Needed',
     description: 'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
-    url: 'https://calorie-tracker-ai.vercel.app',
+    url: 'https://ai-calorietracker.vercel.app',
     siteName: 'AI Calorie Tracker',
     images: [
       {
