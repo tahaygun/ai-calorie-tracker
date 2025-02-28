@@ -23,14 +23,21 @@ import axios from 'axios';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+export interface OpenAIServiceConfig {
+  apiKey: string;
+  model: string;
+}
+
 export class OpenAIService {
   private readonly apiKey: string;
+  private readonly model: string;
 
-  constructor(apiKey: string) {
-    if (!apiKey) {
+  constructor(config: OpenAIServiceConfig) {
+    if (!config.apiKey) {
       throw new Error('OpenAI API key is required');
     }
-    this.apiKey = apiKey;
+    this.apiKey = config.apiKey;
+    this.model = config.model;
   }
 
   private splitFoodDescription(description: string): string[] {
@@ -41,13 +48,13 @@ export class OpenAIService {
       .filter((item) => item.length > 0);
   }
 
-  async analyzeFoodData(input: FoodInput): Promise<FoodItemNutrition[]> {
+  async analyzeFoodData(input: string): Promise<FoodItemNutrition[]> {
     try {
-      const foodItems = this.splitFoodDescription(input.foodDescription);
+      const foodItems = this.splitFoodDescription(input);
       const response = await axios.post(
         OPENAI_API_URL,
         {
-          model: 'gpt-4o-mini',
+          model: this.model,
           messages: [
             {
               role: 'system',

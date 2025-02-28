@@ -2,7 +2,6 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useState } from 'react';
 import FavoritesModal from './components/FavoritesModal';
-import Navigation from './components/Navigation';
 import SettingsModal from './components/SettingsModal';
 
 interface MealEntry {
@@ -24,6 +23,7 @@ export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [targetCalories, setTargetCalories] = useState(0);
+  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -31,33 +31,28 @@ export default function Home() {
     const storedFavorites = localStorage.getItem('favorite_meals');
     const storedApiKey = localStorage.getItem('openai_api_key');
     const storedTargetCalories = localStorage.getItem('target_calories');
+    const storedModel = localStorage.getItem('selected_model');
 
-    if (storedMeals) {
-      setDailyMeals(JSON.parse(storedMeals));
-    }
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
-    }
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    } else {
+    if (storedMeals) setDailyMeals(JSON.parse(storedMeals));
+    if (storedFavorites) setFavorites(JSON.parse(storedFavorites));
+    if (storedApiKey) setApiKey(storedApiKey);
+    if (storedTargetCalories) setTargetCalories(parseInt(storedTargetCalories));
+    if (storedModel) setSelectedModel(storedModel);
+
+    if (!storedApiKey) {
       setShowApiKeyPrompt(true);
       setIsSettingsOpen(true);
     }
-    if (storedTargetCalories) {
-      setTargetCalories(parseInt(storedTargetCalories));
-    }
   }, []);
 
-  const handleSaveApiKey = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem('openai_api_key', key);
+  const handleSaveSettings = (settings: { apiKey: string; targetCalories: number; model: string }) => {
+    setApiKey(settings.apiKey);
+    setTargetCalories(settings.targetCalories);
+    setSelectedModel(settings.model);
+    localStorage.setItem('openai_api_key', settings.apiKey);
+    localStorage.setItem('target_calories', settings.targetCalories.toString());
+    localStorage.setItem('selected_model', settings.model);
     setShowApiKeyPrompt(false);
-  };
-
-  const handleSaveTargetCalories = (calories: number) => {
-    setTargetCalories(calories);
-    localStorage.setItem('target_calories', calories.toString());
   };
 
   const saveMealToStorage = (meal: MealEntry) => {
@@ -108,6 +103,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
           'X-OpenAI-Key': apiKey,
+          'X-OpenAI-Model': selectedModel,
         },
         body: JSON.stringify({ description: mealDescription }),
       });
@@ -237,7 +233,6 @@ export default function Home() {
 
   return (
     <div className='min-h-screen bg-gray-900 text-gray-100'>
-      <Navigation />
       <main className='max-w-2xl mx-auto p-4'>
         <div className='flex justify-end gap-2 mb-4'>
           <button
@@ -409,8 +404,8 @@ export default function Home() {
         onClose={() => setIsSettingsOpen(false)}
         apiKey={apiKey}
         targetCalories={targetCalories}
-        onSaveApiKey={handleSaveApiKey}
-        onSaveTargetCalories={handleSaveTargetCalories}
+        selectedModel={selectedModel}
+        onSaveSettings={handleSaveSettings}
       />
     </div>
   );

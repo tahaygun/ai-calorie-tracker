@@ -1,7 +1,6 @@
 'use client';
 import type { FoodItemNutrition } from '@/lib/openai';
 import { useEffect, useState } from 'react';
-import Navigation from '../components/Navigation';
 
 interface DailyTotal {
   date: string;
@@ -63,7 +62,6 @@ export default function History() {
 
   return (
     <div className='min-h-screen bg-gray-900 text-gray-100'>
-      <Navigation />
       <main className='max-w-2xl mx-auto p-4'>
         <div className='space-y-4'>
           <h1 className='text-xl font-semibold mb-4'>Nutrition History</h1>

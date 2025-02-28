@@ -24,6 +24,14 @@ export default function Navigation() {
           >
             History
           </Link>
+          <Link
+            href='/about'
+            className={`inline-flex items-center px-3 ${
+              pathname === '/about' ? 'text-white border-b-2 border-blue-500' : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            About
+          </Link>
         </div>
       </div>
     </nav>
