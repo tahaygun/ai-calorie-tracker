@@ -1,6 +1,6 @@
 {
   "name": "AI Calorie Tracker",
-  "short_name": "Calories",
+  "short_name": "AI Calorie Tracker",
   "description": "Track your daily calories and nutrition with AI-powered food analysis",
   "start_url": "/",
   "display": "standalone",
