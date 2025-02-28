@@ -94,6 +94,8 @@ export default function Home() {
 
   const handleSelectFavorite = (favorite: MealEntry) => {
     setMealDescription(favorite.description);
+    setEditableItems(favorite.items);
+    setIsEditing(true);
     setIsFavoritesOpen(false);
   };
 
