@@ -75,6 +75,11 @@ export default function Home() {
     localStorage.setItem('favorite_meals', JSON.stringify(favorites));
   }, [apiKey, targetCalories, selectedModel, debugMode, favorites]);
 
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem(`meals_${today}`, JSON.stringify(dailyMeals));
+  }, [dailyMeals]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!apiKey) {
@@ -122,9 +127,7 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      if (mealDescription) {
-        formData.append('description', mealDescription);
-      }
+      formData.append('description', mealDescription || 'Food image analysis');
 
       const response = await fetch('/api/meals/image', {
         method: 'POST',
@@ -141,6 +144,10 @@ export default function Home() {
       if (response.ok && data.nutritionData) {
         setEditableItems(data.nutritionData);
         setIsEditing(true);
+        if (!mealDescription) {
+          const itemDescriptions = data.nutritionData.map((item: FoodItemNutrition) => item.item);
+          setMealDescription(itemDescriptions.join(', '));
+        }
         if (data.debugInfo) {
           setTokenUsage(data.debugInfo);
         }
