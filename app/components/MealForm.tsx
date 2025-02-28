@@ -16,7 +16,6 @@ interface MealFormProps {
 
 export default function MealForm({ mealDescription, setMealDescription, onSubmit, onImageUpload, isLoading, tokenUsage }: MealFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -26,25 +25,6 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      await handleImageSelect(file);
-    }
-  };
 
   const handleImageSelect = async (file: File) => {
     try {
@@ -114,7 +94,7 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
   };
 
   if (!isMounted) {
-    return null; // or a loading state
+    return null;
   }
 
   return (
@@ -128,7 +108,7 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
           value={mealDescription}
           onChange={(e) => setMealDescription(e.target.value)}
           className='w-full p-2 border rounded bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400'
-          placeholder='Example: 2 eggs, 1 slice of toast, 1 apple'
+          placeholder={selectedImage ? 'Add a description of your meal if needed here.' : 'Example: 2 eggs, 1 slice of toast, 1 apple'}
           rows={3}
           required={selectedFile === null}
           disabled={isLoading}
@@ -137,14 +117,7 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
 
       {error && <div className='p-3 bg-red-900/50 border border-red-700 rounded text-red-200 text-sm'>{error}</div>}
 
-      <div
-        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-          isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700 hover:border-gray-500'
-        } ${isLoading || isCompressing ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
+      <div className='space-y-3'>
         <input
           ref={fileInputRef}
           type='file'
@@ -174,9 +147,9 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
         />
 
         {selectedImage ? (
-          <div className='space-y-2'>
-            <div className='relative inline-block'>
-              <img src={selectedImage} alt='Selected food' className='max-h-48 mx-auto rounded' />
+          <div className='space-y-2 flex justify-center'>
+            <div className='relative'>
+              <img src={selectedImage} alt='Selected food' className='max-h-32 rounded' />
               <button
                 type='button'
                 onClick={(e) => {
@@ -191,20 +164,20 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
                 </svg>
               </button>
             </div>
-            <p className='text-sm text-gray-400'>Click or drag to replace image</p>
           </div>
         ) : (
-          <div className='relative h-48'>
-            <div
-              className='absolute inset-0 flex flex-col items-center justify-center cursor-pointer'
+          <div className='flex gap-2'>
+            <button
+              type='button'
               onClick={() => !isLoading && !isCompressing && fileInputRef.current?.click()}
+              className='flex-1 p-2 border border-gray-700 rounded hover:bg-gray-700 transition-colors flex items-center justify-center gap-2'
+              disabled={isLoading || isCompressing}
             >
               <svg
-                className='w-8 h-8 text-gray-400 mb-2'
+                className='w-5 h-5 text-gray-400'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'
               >
                 <path
                   strokeLinecap='round'
@@ -213,27 +186,24 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
                   d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
                 />
               </svg>
-              <p className='text-sm text-gray-400'>Click or drag and drop an image here</p>
-            </div>
+              Upload Image
+            </button>
             <button
               type='button'
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              onClick={() => {
                 const cameraInput = document.getElementById('camera-input');
                 if (cameraInput) {
                   cameraInput.click();
                 }
               }}
-              className='absolute left-2 bottom-0 p-2 rounded-full hover:bg-gray-700 transition-colors'
+              className='flex-1 p-2 border border-gray-700 rounded hover:bg-gray-700 transition-colors flex items-center justify-center gap-2'
               disabled={isLoading || isCompressing}
             >
               <svg
-                className='w-6 h-6 text-gray-400'
+                className='w-5 h-5 text-gray-400'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'
               >
                 <path
                   strokeLinecap='round'
@@ -243,6 +213,7 @@ export default function MealForm({ mealDescription, setMealDescription, onSubmit
                 />
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 13a3 3 0 11-6 0 3 3 0 016 0z' />
               </svg>
+              Take Photo
             </button>
           </div>
         )}
