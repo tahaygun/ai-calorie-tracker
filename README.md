@@ -93,7 +93,21 @@ Contributions are welcome! Feel free to:
 
 ## 📝 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is available under a dual-license model:
+
+1. **GNU GPL v3 License** - For non-commercial use:
+
+   - Free to use, modify, and distribute
+   - Any modifications must be open-sourced
+   - Perfect for personal use, educational purposes, and open-source projects
+
+2. **Commercial License** - For business use:
+   - Allows commercial use and integration
+   - Keep modifications private
+   - Priority support and updates
+   - Contact [@tahaygun](https://github.com/tahaygun) for commercial licensing
+
+For more details, see the [LICENSE](LICENSE) file.
 
 ## 🙏 Credits
 
