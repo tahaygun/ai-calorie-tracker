@@ -72,7 +72,7 @@ export class OpenAIService {
 
   async analyzeImageData(base64Image: string, description?: string): Promise<AnalysisResponse> {
     const prompt = description
-      ? `Analyze this food image and the provided description: "${description}". Provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.`
+      ? `Analyze this food image with the provided description together: "${description}". Provide nutritional information for each visible item on the image, even if it is not listed in the description. Use the description as helper. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.`
       : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.';
 
     const response = await this.client.chat.completions.create({

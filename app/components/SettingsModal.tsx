@@ -68,9 +68,11 @@ export default function SettingsModal({
             onChange={(e) => onModelChange(e.target.value)}
             className='w-full p-2 border rounded bg-gray-700 border-gray-600 text-gray-100'
           >
-            <option value='gpt-3.5-turbo'>GPT-3.5 Turbo</option>
+            <option value='gpt-4o-mini'>gpt-4o-mini (Mini, Recommended)</option>
+            <option value='gpt-4o'>gpt-4o (Standard)</option>
+            <option value='gpt-3.5-turbo'>GPT-3.5 Turbo (Faster, cheaper)</option>
             <option value='gpt-4'>GPT-4</option>
-            <option value='gpt-4-vision-preview'>GPT-4 Vision</option>
+            <option value='custom'>Custom Model</option>
           </select>
         </div>
 

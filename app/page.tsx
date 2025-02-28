@@ -22,8 +22,9 @@ export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [targetCalories, setTargetCalories] = useState(0);
-  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
+  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const [debugMode, setDebugMode] = useState(false);
+  const [resetImageUpload, setResetImageUpload] = useState(0);
   const [tokenUsage, setTokenUsage] = useState<{
     totalTokens: number;
     promptTokens: number;
@@ -31,6 +32,8 @@ export default function Home() {
   } | null>(null);
 
   useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const storedMeals = localStorage.getItem(`meals_${today}`);
     const storedApiKey = localStorage.getItem('openai_api_key');
     const storedTargetCalories = localStorage.getItem('target_calories');
     const storedModel = localStorage.getItem('selected_model');
@@ -45,6 +48,10 @@ export default function Home() {
 
     if (storedTargetCalories) {
       setTargetCalories(parseInt(storedTargetCalories));
+    }
+
+    if (storedMeals) {
+      setDailyMeals(JSON.parse(storedMeals));
     }
 
     if (storedModel) {
@@ -160,6 +167,7 @@ export default function Home() {
     setEditableItems([]);
     setIsEditing(false);
     setTokenUsage(null);
+    setResetImageUpload((prev) => prev + 1);
   };
 
   const handleDeleteMeal = (id: string) => {
@@ -261,6 +269,7 @@ export default function Home() {
           isEditing={isEditing}
           isLoading={isLoading}
           tokenUsage={tokenUsage || undefined}
+          key={resetImageUpload}
         />
 
         {dailyMeals.length > 0 && targetCalories > 0 && (

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useRef, useState } from 'react';
 
 interface MealFormProps {
@@ -26,6 +27,7 @@ export default function MealForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -42,33 +44,38 @@ export default function MealForm({
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      await handleImageUpload(file);
+      handleImageSelect(file);
     }
   };
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      await onImageUpload(file);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
-    }
+  const handleImageSelect = (file: File) => {
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+    setSelectedFile(file);
   };
 
   const handleDeleteImage = () => {
     if (selectedImage) {
       URL.revokeObjectURL(selectedImage);
       setSelectedImage(null);
+      setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedFile) {
+      await onImageUpload(selectedFile);
+    } else {
+      await onSubmit(e);
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit} className='space-y-3'>
+    <form onSubmit={handleFormSubmit} className='space-y-3'>
       <div>
         <label htmlFor='mealDescription' className='block text-sm font-medium mb-1'>
           What did you eat? (Separate items with commas)
@@ -80,7 +87,8 @@ export default function MealForm({
           className='w-full p-2 border rounded bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400'
           placeholder='Example: 2 eggs, 1 slice of toast, 1 apple'
           rows={3}
-          required
+          required={selectedFile === null}
+          disabled={isEditing || isLoading}
         />
       </div>
 
@@ -101,7 +109,7 @@ export default function MealForm({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) {
-              handleImageUpload(file);
+              handleImageSelect(file);
             }
           }}
         />
