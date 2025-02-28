@@ -1,12 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface MealFormProps {
   mealDescription: string;
   setMealDescription: (description: string) => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
   onImageUpload: (file: File) => Promise<void>;
-  isEditing: boolean;
   isLoading: boolean;
   tokenUsage?: {
     totalTokens: number;
@@ -15,20 +13,13 @@ interface MealFormProps {
   };
 }
 
-export default function MealForm({
-  mealDescription,
-  setMealDescription,
-  onSubmit,
-  onImageUpload,
-  isEditing,
-  isLoading,
-  tokenUsage,
-}: MealFormProps) {
+export default function MealForm({ mealDescription, setMealDescription, onSubmit, onImageUpload, isLoading, tokenUsage }: MealFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -72,10 +63,20 @@ export default function MealForm({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (selectedFile) {
-      await onImageUpload(selectedFile);
+      try {
+        await onImageUpload(selectedFile);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to analyze image. Please try again.');
+      }
     } else {
-      await onSubmit(e);
+      try {
+        await onSubmit(e);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to analyze meal. Please try again.');
+      }
     }
   };
 
@@ -97,18 +98,20 @@ export default function MealForm({
           placeholder='Example: 2 eggs, 1 slice of toast, 1 apple'
           rows={3}
           required={selectedFile === null}
-          disabled={isEditing || isLoading}
+          disabled={isLoading}
         />
       </div>
+
+      {error && <div className='p-3 bg-red-900/50 border border-red-700 rounded text-red-200 text-sm'>{error}</div>}
 
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
           isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700 hover:border-gray-500'
-        }`}
+        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => !isLoading && fileInputRef.current?.click()}
       >
         <input
           ref={fileInputRef}
@@ -121,6 +124,7 @@ export default function MealForm({
               handleImageSelect(file);
             }
           }}
+          disabled={isLoading}
         />
 
         {selectedImage ? (
@@ -177,7 +181,7 @@ export default function MealForm({
       <button
         type='submit'
         className='w-full bg-blue-600 text-sm py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:bg-blue-800 disabled:cursor-not-allowed'
-        disabled={isEditing || isLoading}
+        disabled={isLoading}
       >
         {isLoading ? 'Analyzing...' : 'Analyze Meal'}
       </button>

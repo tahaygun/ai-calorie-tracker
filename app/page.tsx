@@ -62,7 +62,7 @@ export default function Home() {
       setIsEditing(true);
     } catch (error) {
       console.error('Error analyzing meal:', error);
-      alert('Failed to analyze meal. Please try again.');
+      throw error;
     }
   };
 
@@ -82,7 +82,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error analyzing image:', error);
-      alert('Failed to analyze image. Please try again.');
+      throw error;
     }
   };
 
@@ -137,7 +137,6 @@ export default function Home() {
           setMealDescription={setMealDescription}
           onSubmit={handleSubmit}
           onImageUpload={handleImageUpload}
-          isEditing={isEditing}
           isLoading={isLoading}
           tokenUsage={tokenUsage || undefined}
           key={resetImageUpload}
