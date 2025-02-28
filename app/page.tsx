@@ -1,15 +1,14 @@
 'use client';
-import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useState } from 'react';
+import CalorieProgress from './components/CalorieProgress';
 import FavoritesModal from './components/FavoritesModal';
+import MealForm from './components/MealForm';
+import MealList from './components/MealList';
+import NutritionEditor from './components/NutritionEditor';
 import SettingsModal from './components/SettingsModal';
-
-interface MealEntry {
-  id: string;
-  description: string;
-  items: FoodItemNutrition[];
-  timestamp: string;
-}
+import SettingsPrompt from './components/SettingsPrompt';
+import type { FoodItemNutrition, NutritionData } from './lib/openai';
+import type { MealEntry, NutritionTotals } from './lib/types';
 
 export default function Home() {
   const [mealDescription, setMealDescription] = useState('');
@@ -146,11 +145,11 @@ export default function Home() {
     setDailyMeals(updatedMeals);
   };
 
-  const calculateDailyTotals = () => {
+  const calculateDailyTotals = (): NutritionTotals => {
     return dailyMeals.reduce(
       (totals, meal) => {
         const mealTotals = meal.items.reduce(
-          (itemTotals, item) => ({
+          (itemTotals: NutritionTotals, item: FoodItemNutrition) => ({
             calories: itemTotals.calories + item.nutrition.calories,
             protein: itemTotals.protein + item.nutrition.protein,
             carbs: itemTotals.carbs + item.nutrition.carbs,
@@ -187,50 +186,6 @@ export default function Home() {
     );
   };
 
-  const calorieProgress = () => {
-    const totals = calculateDailyTotals();
-    const calories = Math.round(totals.calories);
-    if (!targetCalories) return null;
-
-    const percentage = Math.min((calories / targetCalories) * 100, 100);
-    const remaining = targetCalories - calories;
-    const isOver = remaining < 0;
-
-    let barColor = 'bg-green-500';
-    let textColor = 'text-green-400';
-    if (isOver) {
-      barColor = 'bg-red-500';
-      textColor = 'text-red-400';
-    } else if (remaining < targetCalories * 0.1) {
-      barColor = 'bg-yellow-500';
-      textColor = 'text-yellow-400';
-    }
-
-    return (
-      <div className='p-3 bg-gray-800 rounded border border-gray-700'>
-        <div className='flex justify-between items-baseline mb-1.5'>
-          <div className='text-sm font-medium'>
-            {calories} / {targetCalories} kcal
-          </div>
-          <div className={`text-sm ${textColor}`}>{isOver ? `${Math.abs(remaining)} over` : `${remaining} left`}</div>
-        </div>
-        <div className='h-2 bg-gray-700 rounded overflow-hidden'>
-          <div className={`h-full ${barColor} transition-all duration-300`} style={{ width: `${percentage}%` }} />
-        </div>
-        <div className='mt-2 grid grid-cols-4 gap-2 text-center text-xs text-gray-400'>
-          {Object.entries(totals)
-            .filter(([key]) => key !== 'calories')
-            .map(([key, value]) => (
-              <div key={key}>
-                <span className='block font-medium text-gray-300'>{Math.round(value)}g</span>
-                {key.charAt(0).toUpperCase()}
-              </div>
-            ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className='min-h-screen bg-gray-900 text-gray-100'>
       <main className='max-w-2xl mx-auto p-4'>
@@ -249,167 +204,38 @@ export default function Home() {
           </button>
         </div>
 
-        {showApiKeyPrompt && (
-          <div className='mb-4 p-3 bg-yellow-900/50 border border-yellow-700 rounded'>
-            <p className='text-sm text-yellow-200'>
-              Please set your OpenAI API key in settings.{' '}
-              <button onClick={() => setIsSettingsOpen(true)} className='text-yellow-400 hover:text-yellow-300 underline'>
-                Open Settings
-              </button>
-            </p>
+        {showApiKeyPrompt && <SettingsPrompt type='apiKey' onOpenSettings={() => setIsSettingsOpen(true)} />}
+        {!targetCalories && <SettingsPrompt type='calorieTarget' onOpenSettings={() => setIsSettingsOpen(true)} />}
+
+        <MealForm
+          mealDescription={mealDescription}
+          setMealDescription={setMealDescription}
+          onSubmit={handleSubmit}
+          isEditing={isEditing}
+          isLoading={isLoading}
+        />
+
+        {dailyMeals.length > 0 && targetCalories > 0 && (
+          <div className='mt-4 mb-6'>
+            <CalorieProgress totals={calculateDailyTotals()} targetCalories={targetCalories} />
           </div>
         )}
-
-        {!targetCalories && (
-          <div className='mb-4 p-3 bg-blue-900/50 border border-blue-700 rounded'>
-            <p className='text-sm text-blue-200'>
-              Set your daily calorie target in settings to track your progress.{' '}
-              <button onClick={() => setIsSettingsOpen(true)} className='text-blue-400 hover:text-blue-300 underline'>
-                Open Settings
-              </button>
-            </p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className='space-y-3'>
-          <div>
-            <label htmlFor='mealDescription' className='block text-sm font-medium mb-1'>
-              What did you eat? (Separate items with commas)
-            </label>
-            <textarea
-              id='mealDescription'
-              value={mealDescription}
-              onChange={(e) => setMealDescription(e.target.value)}
-              className='w-full p-2 border rounded bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400'
-              placeholder='Example: 2 eggs, 1 slice of toast, 1 apple'
-              rows={3}
-              required
-            />
-          </div>
-
-          <button
-            type='submit'
-            className='w-full bg-blue-600 text-sm py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:bg-blue-800 disabled:cursor-not-allowed'
-            disabled={isEditing || isLoading}
-          >
-            {isLoading ? 'Analyzing...' : 'Analyze Meal'}
-          </button>
-        </form>
-
-        {dailyMeals.length > 0 && <div className='mt-4 mb-6'>{calorieProgress()}</div>}
 
         {isEditing && editableItems.length > 0 && (
-          <div className='mt-6 p-3 bg-gray-800 rounded border border-gray-700'>
-            <h2 className='text-sm font-semibold mb-2'>Verify Nutrition Information</h2>
-            <div className='space-y-3'>
-              {editableItems.map((item, itemIndex) => (
-                <div key={itemIndex} className='p-3 bg-gray-700 rounded'>
-                  <p className='text-sm mb-2'>{item.item}</p>
-                  <div className='grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm'>
-                    {Object.entries(item.nutrition).map(([key, value]) => (
-                      <div key={key}>
-                        <label className='text-xs text-gray-400 block'>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                        <input
-                          type='number'
-                          value={value}
-                          onChange={(e) => updateItemNutrition(itemIndex, key as keyof NutritionData, parseFloat(e.target.value) || 0)}
-                          className='w-full p-1 border rounded bg-gray-600 border-gray-500 text-gray-100'
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className='flex gap-2 mt-3'>
-              <button onClick={handleConfirmMeal} className='bg-green-600 text-sm py-1.5 px-3 rounded hover:bg-green-700 transition-colors'>
-                Confirm & Save
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditableItems([]);
-                }}
-                className='bg-gray-600 text-sm py-1.5 px-3 rounded hover:bg-gray-700 transition-colors'
-              >
-                Cancel
-              </button>
-            </div>
+          <div className='mt-6'>
+            <NutritionEditor
+              items={editableItems}
+              onUpdateItem={updateItemNutrition}
+              onConfirm={handleConfirmMeal}
+              onCancel={() => {
+                setIsEditing(false);
+                setEditableItems([]);
+              }}
+            />
           </div>
         )}
 
-        {dailyMeals.length > 0 && (
-          <div className='mt-6'>
-            <h3 className='text-sm font-semibold mb-2'>Logged Meals</h3>
-            <div className='space-y-3'>
-              {dailyMeals.map((meal) => (
-                <div key={meal.id} className='p-3 bg-gray-800 rounded border border-gray-700'>
-                  <div className='flex justify-between items-start gap-3 mb-2'>
-                    <p className='text-sm'>{meal.description}</p>
-                    <div className='flex gap-2 shrink-0'>
-                      <button
-                        onClick={() => toggleFavorite(meal)}
-                        className={`text-xl leading-none ${
-                          isMealFavorite(meal.id) ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-400'
-                        }`}
-                      >
-                        ★
-                      </button>
-                      <button onClick={() => handleDeleteMeal(meal.id)} className='text-sm text-red-400 hover:text-red-300'>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  <div className='space-y-2'>
-                    {meal.items.map((item, index) => (
-                      <div key={index} className='bg-gray-700 p-2 rounded'>
-                        <p className='text-sm mb-1'>{item.item}</p>
-                        <div className='grid grid-cols-5 gap-2 text-xs text-gray-300'>
-                          <div>
-                            <span className='text-gray-400'>Cal</span> {item.nutrition.calories}
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>P</span> {item.nutrition.protein}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>C</span> {item.nutrition.carbs}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>F</span> {item.nutrition.fat}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>Fb</span> {item.nutrition.fiber}g
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {meal.items.length > 1 && (
-                      <div className='bg-gray-700/50 p-2 rounded mt-2 border-t border-gray-600'>
-                        <div className='grid grid-cols-5 gap-2 text-xs text-gray-300'>
-                          <div>
-                            <span className='text-gray-400'>Cal</span> {meal.items.reduce((sum, item) => sum + item.nutrition.calories, 0)}
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>P</span> {meal.items.reduce((sum, item) => sum + item.nutrition.protein, 0)}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>C</span> {meal.items.reduce((sum, item) => sum + item.nutrition.carbs, 0)}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>F</span> {meal.items.reduce((sum, item) => sum + item.nutrition.fat, 0)}g
-                          </div>
-                          <div>
-                            <span className='text-gray-400'>Fb</span> {meal.items.reduce((sum, item) => sum + item.nutrition.fiber, 0)}g
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <MealList meals={dailyMeals} onToggleFavorite={toggleFavorite} onDelete={handleDeleteMeal} isFavorite={isMealFavorite} />
       </main>
 
       <FavoritesModal
