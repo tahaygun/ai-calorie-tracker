@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Calorie Tracker
 
-## Getting Started
+A free, open-source calorie tracking application powered by AI. Track your daily nutrition with advanced food analysis - no account needed!
 
-First, run the development server:
+![AI Calorie Tracker](public/icons/icon-512x512.png)
+
+## 🌟 Features
+
+- **AI-Powered Analysis**: Get instant nutritional information for any food or meal using OpenAI's advanced language model
+- **No Account Required**: Start tracking immediately - no sign-up, no hassle
+- **Daily Summaries**: View your daily calorie and nutrition totals
+- **Favorites System**: Save your frequently eaten meals for quick access
+- **PWA Support**: Install as a mobile app on any device
+- **Offline Capable**: Continue using the app even without internet
+- **Dark Theme**: Easy on the eyes with a modern dark interface
+- **Local Storage**: All data stored locally on your device for privacy
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- An OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/tahaygun/ai-calorie-tracker.git
+cd ai-calorie-tracker
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 🔧 Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 14**: React framework for production
+- **TypeScript**: Type-safe code
+- **Tailwind CSS**: Utility-first CSS framework
+- **OpenAI API**: AI-powered food analysis
+- **next-pwa**: Progressive Web App support
+- **Local Storage**: Client-side data persistence
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 PWA Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Installable on mobile devices
+- Offline support
+- Push notifications (coming soon)
+- Background sync (coming soon)
 
-## Deploy on Vercel
+## 🤝 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions are welcome! Feel free to:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/improvement`)
+3. Make your changes
+4. Commit your changes (`git commit -am 'Add new feature'`)
+5. Push to the branch (`git push origin feature/improvement`)
+6. Create a Pull Request
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Credits
+
+- Created by [@tahaygun](https://github.com/tahaygun)
+- Powered by [OpenAI](https://openai.com/)
+- Built with [Next.js](https://nextjs.org/)
+
+## 🔗 Links
+
+- [Live Demo](https://calorie-tracker-ai.vercel.app)
+- [GitHub Repository](https://github.com/tahaygun/ai-calorie-tracker)
+- [Report Bug](https://github.com/tahaygun/ai-calorie-tracker/issues)
+- [Request Feature](https://github.com/tahaygun/ai-calorie-tracker/issues)
+
+## 📸 Screenshots
+
+[Coming Soon]
+
+---
+
+Made with ❤️ by [@tahaygun](https://github.com/tahaygun)
