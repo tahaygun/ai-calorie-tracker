@@ -1,6 +1,7 @@
 'use client';
 import type { FoodItemNutrition } from '@/lib/openai';
 import { useEffect, useState } from 'react';
+import DayMealsModal from '../components/DayMealsModal';
 
 interface DailyTotal {
   date: string;
@@ -19,6 +20,8 @@ interface StoredMeal {
 
 export default function History() {
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedMeals, setSelectedMeals] = useState<StoredMeal[]>([]);
 
   useEffect(() => {
     // Get all localStorage keys
@@ -60,6 +63,12 @@ export default function History() {
     setDailyTotals(totals);
   }, []);
 
+  const handleDayClick = (date: string) => {
+    const meals = JSON.parse(localStorage.getItem(`meals_${date}`) || '[]') as StoredMeal[];
+    setSelectedDate(date);
+    setSelectedMeals(meals);
+  };
+
   return (
     <div className='min-h-screen bg-gray-900 text-gray-100'>
       <main className='max-w-2xl mx-auto p-4'>
@@ -70,7 +79,11 @@ export default function History() {
           ) : (
             <div className='grid gap-3'>
               {dailyTotals.map((day) => (
-                <div key={day.date} className='bg-gray-800 rounded-lg p-4 flex justify-between items-center'>
+                <button
+                  key={day.date}
+                  onClick={() => handleDayClick(day.date)}
+                  className='bg-gray-800 rounded-lg p-4 flex justify-between items-center w-full hover:bg-gray-750 transition-colors text-left'
+                >
                   <div>
                     <p className='font-medium'>{new Date(day.date).toLocaleDateString()}</p>
                     <p className='text-sm text-gray-400'>
@@ -81,12 +94,14 @@ export default function History() {
                     <p className='text-lg font-semibold'>{Math.round(day.calories)}</p>
                     <p className='text-sm text-gray-400'>calories</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
         </div>
       </main>
+
+      <DayMealsModal isOpen={selectedDate !== null} onClose={() => setSelectedDate(null)} date={selectedDate || ''} meals={selectedMeals} />
     </div>
   );
 }

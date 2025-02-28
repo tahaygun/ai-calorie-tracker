@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 export default function AboutPage() {
   return (
-    <div className='container mx-auto px-4 py-8 max-w-4xl'>
+    <div className='container mx-auto px-4 py-8 max-w-4xl bg-gray-900 text-gray-100'>
       <h1 className='text-3xl font-bold mb-8 text-center'>About AI Calorie Tracker</h1>
 
       <section className='mb-8'>
