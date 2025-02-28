@@ -7,6 +7,8 @@ interface SettingsModalProps {
   onTargetCaloriesChange: (value: number) => void;
   selectedModel: string;
   onModelChange: (value: string) => void;
+  customModelName: string;
+  onCustomModelNameChange: (value: string) => void;
   debugMode: boolean;
   onDebugModeChange: (value: boolean) => void;
 }
@@ -20,6 +22,8 @@ export default function SettingsModal({
   onTargetCaloriesChange,
   selectedModel,
   onModelChange,
+  customModelName,
+  onCustomModelNameChange,
   debugMode,
   onDebugModeChange,
 }: SettingsModalProps) {
@@ -75,6 +79,22 @@ export default function SettingsModal({
             <option value='custom'>Custom Model</option>
           </select>
         </div>
+
+        {selectedModel === 'custom' && (
+          <div>
+            <label htmlFor='customModel' className='block text-sm font-medium mb-1'>
+              Custom Model Name
+            </label>
+            <input
+              type='text'
+              id='customModel'
+              value={customModelName}
+              onChange={(e) => onCustomModelNameChange(e.target.value)}
+              className='w-full p-2 border rounded bg-gray-700 border-gray-600 text-gray-100'
+              placeholder='Enter custom model name'
+            />
+          </div>
+        )}
 
         <div className='flex items-center gap-2'>
           <input

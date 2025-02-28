@@ -23,6 +23,7 @@ export default function Home() {
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [targetCalories, setTargetCalories] = useState(0);
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [customModelName, setCustomModelName] = useState('');
   const [debugMode, setDebugMode] = useState(false);
   const [resetImageUpload, setResetImageUpload] = useState(0);
   const [tokenUsage, setTokenUsage] = useState<{
@@ -37,6 +38,7 @@ export default function Home() {
     const storedApiKey = localStorage.getItem('openai_api_key');
     const storedTargetCalories = localStorage.getItem('target_calories');
     const storedModel = localStorage.getItem('selected_model');
+    const storedCustomModel = localStorage.getItem('custom_model');
     const storedDebugMode = localStorage.getItem('debug_mode');
     const storedFavorites = localStorage.getItem('favorite_meals');
 
@@ -58,6 +60,10 @@ export default function Home() {
       setSelectedModel(storedModel);
     }
 
+    if (storedCustomModel) {
+      setCustomModelName(storedCustomModel);
+    }
+
     if (storedDebugMode) {
       setDebugMode(storedDebugMode === 'true');
     }
@@ -71,9 +77,10 @@ export default function Home() {
     localStorage.setItem('openai_api_key', apiKey);
     localStorage.setItem('target_calories', targetCalories.toString());
     localStorage.setItem('selected_model', selectedModel);
+    localStorage.setItem('custom_model', customModelName);
     localStorage.setItem('debug_mode', debugMode.toString());
     localStorage.setItem('favorite_meals', JSON.stringify(favorites));
-  }, [apiKey, targetCalories, selectedModel, debugMode, favorites]);
+  }, [apiKey, targetCalories, selectedModel, customModelName, debugMode, favorites]);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -93,7 +100,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
           'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel,
+          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
         },
         body: JSON.stringify({ description: mealDescription }),
@@ -133,7 +140,7 @@ export default function Home() {
         method: 'POST',
         headers: {
           'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel,
+          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
         },
         body: formData,
@@ -319,6 +326,8 @@ export default function Home() {
           onTargetCaloriesChange={setTargetCalories}
           selectedModel={selectedModel}
           onModelChange={setSelectedModel}
+          customModelName={customModelName}
+          onCustomModelNameChange={setCustomModelName}
           debugMode={debugMode}
           onDebugModeChange={setDebugMode}
         />
