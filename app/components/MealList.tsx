@@ -1,4 +1,4 @@
-import type { MealEntry } from '../lib/types';
+import type { MealEntry } from '../../lib/types';
 import MealItem from './MealItem';
 
 interface MealListProps {

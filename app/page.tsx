@@ -1,5 +1,7 @@
 'use client';
+import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useState } from 'react';
+import type { MealEntry, NutritionTotals } from '../lib/types';
 import CalorieProgress from './components/CalorieProgress';
 import FavoritesModal from './components/FavoritesModal';
 import MealForm from './components/MealForm';
@@ -7,8 +9,6 @@ import MealList from './components/MealList';
 import NutritionEditor from './components/NutritionEditor';
 import SettingsModal from './components/SettingsModal';
 import SettingsPrompt from './components/SettingsPrompt';
-import type { FoodItemNutrition, NutritionData } from './lib/openai';
-import type { MealEntry, NutritionTotals } from './lib/types';
 
 export default function Home() {
   const [mealDescription, setMealDescription] = useState('');
@@ -23,71 +23,50 @@ export default function Home() {
   const [showApiKeyPrompt, setShowApiKeyPrompt] = useState(false);
   const [targetCalories, setTargetCalories] = useState(0);
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
+  const [debugMode, setDebugMode] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState<{
+    totalTokens: number;
+    promptTokens: number;
+    completionTokens: number;
+  } | null>(null);
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const storedMeals = localStorage.getItem(`meals_${today}`);
-    const storedFavorites = localStorage.getItem('favorite_meals');
     const storedApiKey = localStorage.getItem('openai_api_key');
     const storedTargetCalories = localStorage.getItem('target_calories');
     const storedModel = localStorage.getItem('selected_model');
+    const storedDebugMode = localStorage.getItem('debug_mode');
+    const storedFavorites = localStorage.getItem('favorite_meals');
 
-    if (storedMeals) setDailyMeals(JSON.parse(storedMeals));
-    if (storedFavorites) setFavorites(JSON.parse(storedFavorites));
-    if (storedApiKey) setApiKey(storedApiKey);
-    if (storedTargetCalories) setTargetCalories(parseInt(storedTargetCalories));
-    if (storedModel) setSelectedModel(storedModel);
-
-    if (!storedApiKey) {
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+    } else {
       setShowApiKeyPrompt(true);
-      setIsSettingsOpen(true);
+    }
+
+    if (storedTargetCalories) {
+      setTargetCalories(parseInt(storedTargetCalories));
+    }
+
+    if (storedModel) {
+      setSelectedModel(storedModel);
+    }
+
+    if (storedDebugMode) {
+      setDebugMode(storedDebugMode === 'true');
+    }
+
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
     }
   }, []);
 
-  const handleSaveSettings = (settings: { apiKey: string; targetCalories: number; model: string }) => {
-    setApiKey(settings.apiKey);
-    setTargetCalories(settings.targetCalories);
-    setSelectedModel(settings.model);
-    localStorage.setItem('openai_api_key', settings.apiKey);
-    localStorage.setItem('target_calories', settings.targetCalories.toString());
-    localStorage.setItem('selected_model', settings.model);
-    setShowApiKeyPrompt(false);
-  };
-
-  const saveMealToStorage = (meal: MealEntry) => {
-    const today = new Date().toISOString().split('T')[0];
-    const updatedMeals = [...dailyMeals, meal];
-    localStorage.setItem(`meals_${today}`, JSON.stringify(updatedMeals));
-    setDailyMeals(updatedMeals);
-  };
-
-  const toggleFavorite = (meal: MealEntry) => {
-    const isFavorite = favorites.some((fav) => fav.id === meal.id);
-    let updatedFavorites: MealEntry[];
-
-    if (isFavorite) {
-      updatedFavorites = favorites.filter((fav) => fav.id !== meal.id);
-    } else {
-      updatedFavorites = [...favorites, meal];
-    }
-
-    localStorage.setItem('favorite_meals', JSON.stringify(updatedFavorites));
-    setFavorites(updatedFavorites);
-  };
-
-  const isMealFavorite = (mealId: string) => {
-    return favorites.some((fav) => fav.id === mealId);
-  };
-
-  const addFavoriteToToday = (meal: MealEntry) => {
-    const newMeal = {
-      ...meal,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-    };
-    saveMealToStorage(newMeal);
-    setIsFavoritesOpen(false);
-  };
+  useEffect(() => {
+    localStorage.setItem('openai_api_key', apiKey);
+    localStorage.setItem('target_calories', targetCalories.toString());
+    localStorage.setItem('selected_model', selectedModel);
+    localStorage.setItem('debug_mode', debugMode.toString());
+    localStorage.setItem('favorite_meals', JSON.stringify(favorites));
+  }, [apiKey, targetCalories, selectedModel, debugMode, favorites]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,6 +82,7 @@ export default function Home() {
           'Content-Type': 'application/json',
           'X-OpenAI-Key': apiKey,
           'X-OpenAI-Model': selectedModel,
+          'X-Debug-Mode': debugMode ? 'true' : 'false',
         },
         body: JSON.stringify({ description: mealDescription }),
       });
@@ -112,37 +92,103 @@ export default function Home() {
       if (response.ok && data.nutritionData) {
         setEditableItems(data.nutritionData);
         setIsEditing(true);
+        if (data.debugInfo) {
+          setTokenUsage(data.debugInfo);
+        }
       } else {
-        throw new Error(data.error || 'Failed to log meal');
+        throw new Error(data.error || 'Failed to analyze meal');
       }
     } catch (error) {
-      console.error('Error logging meal:', error);
-      alert('Failed to log meal. Please try again.');
+      console.error('Error analyzing meal:', error);
+      alert('Failed to analyze meal. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!apiKey) {
+      setIsSettingsOpen(true);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      if (mealDescription) {
+        formData.append('description', mealDescription);
+      }
+
+      const response = await fetch('/api/meals/image', {
+        method: 'POST',
+        headers: {
+          'X-OpenAI-Key': apiKey,
+          'X-OpenAI-Model': selectedModel,
+          'X-Debug-Mode': debugMode ? 'true' : 'false',
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.nutritionData) {
+        setEditableItems(data.nutritionData);
+        setIsEditing(true);
+        if (data.debugInfo) {
+          setTokenUsage(data.debugInfo);
+        }
+      } else {
+        throw new Error(data.error || 'Failed to analyze image');
+      }
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      alert('Failed to analyze image. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleConfirmMeal = () => {
-    if (editableItems.length > 0) {
-      const newMeal: MealEntry = {
-        id: Date.now().toString(),
-        description: mealDescription,
-        items: editableItems,
-        timestamp: new Date().toISOString(),
-      };
-      saveMealToStorage(newMeal);
-      setMealDescription('');
-      setEditableItems([]);
-      setIsEditing(false);
+    const newMeal: MealEntry = {
+      id: crypto.randomUUID(),
+      description: mealDescription,
+      items: editableItems,
+      timestamp: new Date().toISOString(),
+    };
+    setDailyMeals((prev) => [...prev, newMeal]);
+    setMealDescription('');
+    setEditableItems([]);
+    setIsEditing(false);
+    setTokenUsage(null);
+  };
+
+  const handleDeleteMeal = (id: string) => {
+    setDailyMeals((prev) => prev.filter((meal) => meal.id !== id));
+  };
+
+  const toggleFavorite = (meal: MealEntry) => {
+    const isFavorite = favorites.some((fav) => fav.id === meal.id);
+    if (isFavorite) {
+      setFavorites((prev) => prev.filter((fav) => fav.id !== meal.id));
+    } else {
+      setFavorites((prev) => [...prev, meal]);
     }
   };
 
-  const handleDeleteMeal = (mealId: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const updatedMeals = dailyMeals.filter((meal) => meal.id !== mealId);
-    localStorage.setItem(`meals_${today}`, JSON.stringify(updatedMeals));
-    setDailyMeals(updatedMeals);
+  const isMealFavorite = (id: string) => favorites.some((fav) => fav.id === id);
+
+  const handleSelectFavorite = (meal: MealEntry) => {
+    const newMeal = {
+      ...meal,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+    };
+    setDailyMeals((prev) => [...prev, newMeal]);
+    setIsFavoritesOpen(false);
+  };
+
+  const handleDeleteFavorite = (id: string) => {
+    setFavorites((prev) => prev.filter((meal) => meal.id !== id));
   };
 
   const calculateDailyTotals = (): NutritionTotals => {
@@ -211,8 +257,10 @@ export default function Home() {
           mealDescription={mealDescription}
           setMealDescription={setMealDescription}
           onSubmit={handleSubmit}
+          onImageUpload={handleImageUpload}
           isEditing={isEditing}
           isLoading={isLoading}
+          tokenUsage={tokenUsage || undefined}
         />
 
         {dailyMeals.length > 0 && targetCalories > 0 && (
@@ -230,30 +278,35 @@ export default function Home() {
               onCancel={() => {
                 setIsEditing(false);
                 setEditableItems([]);
+                setTokenUsage(null);
               }}
             />
           </div>
         )}
 
         <MealList meals={dailyMeals} onToggleFavorite={toggleFavorite} onDelete={handleDeleteMeal} isFavorite={isMealFavorite} />
+
+        <FavoritesModal
+          isOpen={isFavoritesOpen}
+          onClose={() => setIsFavoritesOpen(false)}
+          favorites={favorites}
+          onSelect={handleSelectFavorite}
+          onDelete={handleDeleteFavorite}
+        />
+
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          apiKey={apiKey}
+          onApiKeyChange={setApiKey}
+          targetCalories={targetCalories}
+          onTargetCaloriesChange={setTargetCalories}
+          selectedModel={selectedModel}
+          onModelChange={setSelectedModel}
+          debugMode={debugMode}
+          onDebugModeChange={setDebugMode}
+        />
       </main>
-
-      <FavoritesModal
-        isOpen={isFavoritesOpen}
-        onClose={() => setIsFavoritesOpen(false)}
-        favorites={favorites}
-        onAddFavorite={addFavoriteToToday}
-        onRemoveFavorite={(id) => toggleFavorite(favorites.find((f) => f.id === id)!)}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        apiKey={apiKey}
-        targetCalories={targetCalories}
-        selectedModel={selectedModel}
-        onSaveSettings={handleSaveSettings}
-      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ export async function POST(request: Request) {
   try {
     const apiKey = request.headers.get('X-OpenAI-Key');
     const model = request.headers.get('X-OpenAI-Model') || 'gpt-3.5-turbo';
+    const debug = request.headers.get('X-Debug-Mode') === 'true';
 
     if (!apiKey) {
       return NextResponse.json({ error: 'OpenAI API key is required' }, { status: 401 });
@@ -18,12 +19,14 @@ export async function POST(request: Request) {
     const openAIService = new OpenAIService({
       apiKey,
       model,
+      debug,
     });
-    const nutritionData = await openAIService.analyzeFoodData(description);
+    const result = await openAIService.analyzeFoodData(description);
 
     return NextResponse.json({
       message: 'Meal analyzed successfully',
-      nutritionData,
+      nutritionData: result.data,
+      debugInfo: result.debugInfo,
     });
   } catch (error) {
     console.error('Error processing meal:', error);

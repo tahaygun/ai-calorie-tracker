@@ -1,9 +1,4 @@
-// src/types/index.ts
-export interface FoodInput {
-  foodDescription: string;
-  quantity?: number;
-  unit?: string;
-}
+import OpenAI from 'openai';
 
 export interface NutritionData {
   calories: number;
@@ -18,103 +13,106 @@ export interface FoodItemNutrition {
   nutrition: NutritionData;
 }
 
-// src/services/openaiService.ts
-import axios from 'axios';
-
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-
 export interface OpenAIServiceConfig {
   apiKey: string;
   model: string;
+  debug?: boolean;
+}
+
+export interface AnalysisResponse {
+  data: FoodItemNutrition[];
+  debugInfo?: {
+    rawResponse: unknown;
+    totalTokens: number;
+    promptTokens: number;
+    completionTokens: number;
+  };
 }
 
 export class OpenAIService {
-  private readonly apiKey: string;
-  private readonly model: string;
+  private client: OpenAI;
+  private model: string;
+  private debug: boolean;
 
   constructor(config: OpenAIServiceConfig) {
-    if (!config.apiKey) {
-      throw new Error('OpenAI API key is required');
-    }
-    this.apiKey = config.apiKey;
+    this.client = new OpenAI({ apiKey: config.apiKey });
     this.model = config.model;
+    this.debug = config.debug || false;
   }
 
-  private splitFoodDescription(description: string): string[] {
-    // Split by commas and filter out empty strings
-    return description
-      .split(',')
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
+  async analyzeFoodData(description: string): Promise<AnalysisResponse> {
+    const prompt = `Analyze the following meal description and provide nutritional information for each item. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values. Meal description: "${description}"`;
+
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      response_format: { type: 'json_object' },
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) throw new Error('No content in response');
+
+    const parsedResponse = JSON.parse(content);
+    const result: AnalysisResponse = {
+      data: parsedResponse.meal || [],
+    };
+
+    if (this.debug) {
+      result.debugInfo = {
+        rawResponse: parsedResponse,
+        totalTokens: response.usage?.total_tokens || 0,
+        promptTokens: response.usage?.prompt_tokens || 0,
+        completionTokens: response.usage?.completion_tokens || 0,
+      };
+    }
+
+    return result;
   }
 
-  async analyzeFoodData(input: string): Promise<FoodItemNutrition[]> {
-    try {
-      const foodItems = this.splitFoodDescription(input);
-      const response = await axios.post(
-        OPENAI_API_URL,
+  async analyzeImageData(base64Image: string, description?: string): Promise<AnalysisResponse> {
+    const prompt = description
+      ? `Analyze this food image and the provided description: "${description}". Provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.`
+      : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.';
+
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      messages: [
         {
-          model: this.model,
-          messages: [
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
             {
-              role: 'system',
-              content: `You are a nutritional expert. I will give you a list of food items. If the description is one food but with all ingredients, return one item. Return ONLY a JSON array where each item has 'item' and 'nutrition' fields. The nutrition object should have exactly these numeric fields: calories, protein, carbs, fat, fiber. 
-              Example response for "2 eggs, 1 apple":
-              [
-                {
-                  "item": "2 eggs",
-                  "nutrition": {"calories": 150, "protein": 12, "carbs": 1, "fat": 10, "fiber": 0}
-                },
-                {
-                  "item": "1 apple",
-                  "nutrition": {"calories": 95, "protein": 0.5, "carbs": 25, "fat": 0.3, "fiber": 4}
-                }
-              ]`,
-            },
-            {
-              role: 'user',
-              content: `Analyze these food items: ${foodItems.join(', ')}`,
+              type: 'image_url',
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Image}`,
+              },
             },
           ],
-          temperature: 0.7,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      ],
+      response_format: { type: 'json_object' },
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
 
-      const content = response.data.choices[0].message.content;
-      try {
-        const parsedData = JSON.parse(content.trim());
-        // Validate the structure and ensure all numbers are valid
-        const validatedData: FoodItemNutrition[] = parsedData.map((item: FoodItemNutrition) => ({
-          item: item.item,
-          nutrition: {
-            calories: Number(item.nutrition.calories) || 0,
-            protein: Number(item.nutrition.protein) || 0,
-            carbs: Number(item.nutrition.carbs) || 0,
-            fat: Number(item.nutrition.fat) || 0,
-            fiber: Number(item.nutrition.fiber) || 0,
-          },
-        }));
-        return validatedData;
-      } catch (error) {
-        console.error('Error parsing OpenAI response:', content, error);
-        throw new Error('Invalid nutrition data format');
-      }
-    } catch (error) {
-      throw this.handleError(error);
-    }
-  }
+    const content = response.choices[0].message.content;
+    if (!content) throw new Error('No content in response');
 
-  private handleError(error: unknown): Error {
-    if (axios.isAxiosError(error)) {
-      const message = error.response?.data?.error?.message || error.message;
-      return new Error(`OpenAI API Error: ${message}`);
+    const parsedResponse = JSON.parse(content);
+    const result: AnalysisResponse = {
+      data: parsedResponse.items || [],
+    };
+
+    if (this.debug) {
+      result.debugInfo = {
+        rawResponse: parsedResponse,
+        totalTokens: response.usage?.total_tokens || 0,
+        promptTokens: response.usage?.prompt_tokens || 0,
+        completionTokens: response.usage?.completion_tokens || 0,
+      };
     }
-    return new Error('An unexpected error occurred');
+
+    return result;
   }
 }

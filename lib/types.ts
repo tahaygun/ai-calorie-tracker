@@ -1,4 +1,4 @@
-import type { FoodItemNutrition } from './openai';
+import type { FoodItemNutrition } from '@/lib/openai';
 
 export interface MealEntry {
   id: string;
