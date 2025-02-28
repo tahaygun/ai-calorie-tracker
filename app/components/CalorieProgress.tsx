@@ -11,7 +11,10 @@ interface CalorieProgressProps {
   targetCalories: number;
 }
 
-export default function CalorieProgress({ totals, targetCalories }: CalorieProgressProps) {
+export default function CalorieProgress({
+  totals,
+  targetCalories,
+}: CalorieProgressProps) {
   const calories = Math.round(totals.calories);
   const percentage = Math.min((calories / targetCalories) * 100, 100);
   const remaining = targetCalories - calories;
@@ -28,23 +31,30 @@ export default function CalorieProgress({ totals, targetCalories }: CalorieProgr
   }
 
   return (
-    <div className='p-3 bg-gray-800 rounded border border-gray-700'>
+    <div className='border-gray-700 bg-gray-800 p-3 border rounded'>
       <div className='flex justify-between items-baseline mb-1.5'>
-        <div className='text-sm font-medium'>
+        <div className='font-medium text-sm'>
           {calories} / {targetCalories} kcal
         </div>
-        <div className={`text-sm ${textColor}`}>{isOver ? `${Math.abs(remaining)} over` : `${remaining} left`}</div>
+        <div className={`text-sm ${textColor}`}>
+          {isOver ? `${Math.abs(remaining)} over` : `${remaining} left`}
+        </div>
       </div>
-      <div className='h-2 bg-gray-700 rounded overflow-hidden'>
-        <div className={`h-full ${barColor} transition-all duration-300`} style={{ width: `${percentage}%` }} />
+      <div className='bg-gray-700 rounded h-2 overflow-hidden'>
+        <div
+          className={`h-full ${barColor} transition-all duration-300`}
+          style={{ width: `${percentage}%` }}
+        />
       </div>
-      <div className='mt-2 grid grid-cols-4 gap-2 text-center text-xs text-gray-400'>
+      <div className='gap-2 grid grid-cols-4 mt-2 text-center text-gray-400 text-xs'>
         {Object.entries(totals)
           .filter(([key]) => key !== 'calories')
           .map(([key, value]) => (
             <div key={key}>
-              <span className='block font-medium text-gray-300'>{Math.round(value)}g</span>
-              {key.charAt(0).toUpperCase()}
+              <span className='block font-medium text-gray-300'>
+                {Math.round(value)}g
+              </span>
+              <small>{key.toUpperCase()}</small>
             </div>
           ))}
       </div>

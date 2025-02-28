@@ -100,15 +100,6 @@ export default function Home() {
   return (
     <div className='bg-gray-900 min-h-screen text-gray-100'>
       <main className='mx-auto p-4 max-w-2xl'>
-        <div className='flex justify-end gap-2 mb-4'>
-          <button
-            onClick={() => setIsFavoritesOpen(true)}
-            className='bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded text-sm transition-colors'
-          >
-            Favorite Meals
-          </button>
-        </div>
-
         {!apiKey && <SettingsPrompt type='apiKey' />}
         {!targetCalories && <SettingsPrompt type='calorieTarget' />}
 
@@ -119,6 +110,7 @@ export default function Home() {
           onImageUpload={handleImageUpload}
           isLoading={isLoading}
           tokenUsage={tokenUsage || undefined}
+          onOpenFavorites={() => setIsFavoritesOpen(true)}
           key={resetImageUpload}
         />
 
