@@ -90,6 +90,25 @@ export default function AboutPage() {
       </section>
 
       <section className='mb-8'>
+        <h2 className='mb-4 font-semibold text-2xl'>Weight Tracking</h2>
+        <div className='space-y-4'>
+          <p>Track your weight progress alongside your nutrition:</p>
+          <ul className='space-y-2 pl-6 list-disc'>
+            <li>Record your weight entries with optional notes</li>
+            <li>Visualize your progress with an interactive chart</li>
+            <li>Set target weight goals that display on your progress chart</li>
+            <li>Enter weights for current or past dates</li>
+            <li>Manage your weight history with edit and delete options</li>
+            <li>All weight data is stored locally with your nutrition data</li>
+          </ul>
+          <p className='text-gray-400 text-sm'>
+            Tip: Consistent tracking at the same time of day (typically morning,
+            after waking up) provides the most reliable progress data.
+          </p>
+        </div>
+      </section>
+
+      <section className='mb-8'>
         <h2 className='mb-4 font-semibold text-2xl'>Privacy & Data Storage</h2>
         <div className='space-y-4'>
           <p>Your privacy is important to us:</p>
