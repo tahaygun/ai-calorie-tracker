@@ -1,4 +1,3 @@
-import { Reminder } from '@/lib/contexts/SettingsContext';
 import { MealEntry } from '@/lib/types';
 
 export interface UserData {
@@ -8,8 +7,6 @@ export interface UserData {
     selectedModel: string;
     customModelName: string;
     debugMode: boolean;
-    reminders: Reminder[];
-    notificationsEnabled: boolean;
   };
   favorites: MealEntry[];
   mealHistory: Record<string, MealEntry[]>;
@@ -41,11 +38,6 @@ export function exportUserData(): UserData {
   const selectedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
   const customModelName = localStorage.getItem('custom_model') || '';
   const debugMode = localStorage.getItem('debug_mode') === 'true';
-  const reminders = JSON.parse(
-    localStorage.getItem('reminders') || '[]'
-  ) as Reminder[];
-  const notificationsEnabled =
-    localStorage.getItem('notifications_enabled') === 'true';
 
   // Extract favorites
   const favorites = JSON.parse(
@@ -59,8 +51,6 @@ export function exportUserData(): UserData {
       selectedModel,
       customModelName,
       debugMode,
-      reminders,
-      notificationsEnabled,
     },
     favorites,
     mealHistory,
@@ -86,14 +76,6 @@ export function importUserData(
   localStorage.setItem('selected_model', userData.settings.selectedModel);
   localStorage.setItem('custom_model', userData.settings.customModelName);
   localStorage.setItem('debug_mode', userData.settings.debugMode.toString());
-  localStorage.setItem(
-    'reminders',
-    JSON.stringify(userData.settings.reminders)
-  );
-  localStorage.setItem(
-    'notifications_enabled',
-    userData.settings.notificationsEnabled.toString()
-  );
 
   // Import favorites
   localStorage.setItem('favorite_meals', JSON.stringify(userData.favorites));
@@ -135,9 +117,7 @@ export function validateUserData(data: unknown): {
       typeof settings.targetCalories !== 'number' ||
       typeof settings.selectedModel !== 'string' ||
       typeof settings.customModelName !== 'string' ||
-      typeof settings.debugMode !== 'boolean' ||
-      !Array.isArray(settings.reminders) ||
-      typeof settings.notificationsEnabled !== 'boolean'
+      typeof settings.debugMode !== 'boolean'
     ) {
       return { valid: false, message: 'Invalid settings format' };
     }
