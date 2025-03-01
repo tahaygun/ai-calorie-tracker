@@ -11,7 +11,7 @@ export default function DataPortability() {
     message: string;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [includeApiKey, setIncludeApiKey] = useState(false);
+  const [includeApiKey, setIncludeApiKey] = useState(true);
 
   const handleExport = () => {
     try {
