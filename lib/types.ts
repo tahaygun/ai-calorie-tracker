@@ -7,6 +7,13 @@ export interface MealEntry {
   timestamp: string;
 }
 
+export interface WeightEntry {
+  id: string;
+  weight: number;
+  date: string; // ISO format date string
+  note?: string;
+}
+
 export interface NutritionTotals {
   calories: number;
   protein: number;

@@ -19,6 +19,8 @@ interface SettingsContextType {
   setCustomModelName: (name: string) => void;
   debugMode: boolean;
   setDebugMode: (debug: boolean) => void;
+  targetWeight: number;
+  setTargetWeight: (weight: number) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -31,6 +33,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const [customModelName, setCustomModelName] = useState('');
   const [debugMode, setDebugMode] = useState(false);
+  const [targetWeight, setTargetWeight] = useState(0);
 
   // Initialize values from localStorage
   useEffect(() => {
@@ -39,12 +42,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const storedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
     const storedCustomModel = localStorage.getItem('custom_model') || '';
     const storedDebugMode = localStorage.getItem('debug_mode') === 'true';
+    const storedTargetWeight = localStorage.getItem('target_weight');
 
     setApiKey(storedApiKey);
     setTargetCalories(storedCalories ? parseInt(storedCalories) : 0);
     setSelectedModel(storedModel);
     setCustomModelName(storedCustomModel);
     setDebugMode(storedDebugMode);
+    setTargetWeight(storedTargetWeight ? parseFloat(storedTargetWeight) : 0);
   }, []);
 
   // Save settings whenever they change
@@ -54,7 +59,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('selected_model', selectedModel);
     localStorage.setItem('custom_model', customModelName);
     localStorage.setItem('debug_mode', debugMode.toString());
-  }, [apiKey, targetCalories, selectedModel, customModelName, debugMode]);
+    localStorage.setItem('target_weight', targetWeight.toString());
+  }, [
+    apiKey,
+    targetCalories,
+    selectedModel,
+    customModelName,
+    debugMode,
+    targetWeight,
+  ]);
 
   return (
     <SettingsContext.Provider
@@ -69,6 +82,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setCustomModelName,
         debugMode,
         setDebugMode,
+        targetWeight,
+        setTargetWeight,
       }}
     >
       {children}

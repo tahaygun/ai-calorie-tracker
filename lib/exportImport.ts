@@ -1,4 +1,4 @@
-import { MealEntry } from '@/lib/types';
+import { MealEntry, WeightEntry } from '@/lib/types';
 
 export interface UserData {
   settings: {
@@ -7,9 +7,11 @@ export interface UserData {
     selectedModel: string;
     customModelName: string;
     debugMode: boolean;
+    targetWeight: number;
   };
   favorites: MealEntry[];
   mealHistory: Record<string, MealEntry[]>;
+  weightEntries: WeightEntry[];
   [key: string]: unknown; // Add index signature
 }
 
@@ -38,11 +40,17 @@ export function exportUserData(): UserData {
   const selectedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
   const customModelName = localStorage.getItem('custom_model') || '';
   const debugMode = localStorage.getItem('debug_mode') === 'true';
+  const targetWeight = parseFloat(localStorage.getItem('target_weight') || '0');
 
   // Extract favorites
   const favorites = JSON.parse(
     localStorage.getItem('favorite_meals') || '[]'
   ) as MealEntry[];
+
+  // Extract weight entries
+  const weightEntries = JSON.parse(
+    localStorage.getItem('weight_entries') || '[]'
+  ) as WeightEntry[];
 
   return {
     settings: {
@@ -51,9 +59,11 @@ export function exportUserData(): UserData {
       selectedModel,
       customModelName,
       debugMode,
+      targetWeight,
     },
     favorites,
     mealHistory,
+    weightEntries,
   };
 }
 
@@ -77,6 +87,14 @@ export function importUserData(
   localStorage.setItem('custom_model', userData.settings.customModelName);
   localStorage.setItem('debug_mode', userData.settings.debugMode.toString());
 
+  // Import target weight if present (handling backward compatibility)
+  if ('targetWeight' in userData.settings) {
+    localStorage.setItem(
+      'target_weight',
+      userData.settings.targetWeight.toString()
+    );
+  }
+
   // Import favorites
   localStorage.setItem('favorite_meals', JSON.stringify(userData.favorites));
 
@@ -84,6 +102,14 @@ export function importUserData(
   Object.entries(userData.mealHistory).forEach(([date, meals]) => {
     localStorage.setItem(`meals_${date}`, JSON.stringify(meals));
   });
+
+  // Import weight entries if present (handling backward compatibility)
+  if ('weightEntries' in userData) {
+    localStorage.setItem(
+      'weight_entries',
+      JSON.stringify(userData.weightEntries)
+    );
+  }
 }
 
 /**

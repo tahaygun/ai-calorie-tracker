@@ -17,6 +17,8 @@ export default function SettingsPage() {
     setCustomModelName,
     debugMode,
     setDebugMode,
+    targetWeight,
+    setTargetWeight,
   } = useSettings();
 
   const [showApiKey, setShowApiKey] = useState(false);
@@ -101,6 +103,24 @@ export default function SettingsPage() {
             onChange={(e) => setTargetCalories(parseInt(e.target.value) || 0)}
             className='bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100'
             placeholder='2000'
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor='targetWeight'
+            className='block mb-1 font-medium text-sm'
+          >
+            Target Weight (kg)
+          </label>
+          <input
+            type='number'
+            id='targetWeight'
+            value={targetWeight || ''}
+            onChange={(e) => setTargetWeight(parseFloat(e.target.value) || 0)}
+            className='bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100'
+            step='0.1'
+            placeholder='75.0'
           />
         </div>
 
