@@ -21,8 +21,6 @@ export default function SettingsPage() {
     addReminder,
     updateReminder,
     deleteReminder,
-    notificationsEnabled,
-    setNotificationsEnabled,
   } = useSettings();
 
   const [newReminderTime, setNewReminderTime] = useState('12:00');
@@ -77,15 +75,6 @@ export default function SettingsPage() {
 
   const handleToggleReminder = (id: string, enabled: boolean) => {
     updateReminder(id, { enabled });
-  };
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setNotificationsEnabled(true);
-      }
-    }
   };
 
   // Format time for display (convert 24h to 12h format)
@@ -226,161 +215,125 @@ export default function SettingsPage() {
         <div className='pt-5 border-gray-700 border-t'>
           <h2 className='mb-3 font-semibold text-lg'>Reminders</h2>
 
-          <div className='flex items-center gap-2 mb-4'>
-            <input
-              type='checkbox'
-              id='notificationsEnabled'
-              checked={notificationsEnabled}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  requestNotificationPermission();
-                } else {
-                  setNotificationsEnabled(false);
-                }
-              }}
-              className='bg-gray-700 border-gray-600 rounded focus:ring-blue-500 text-blue-500'
-            />
-            <label
-              htmlFor='notificationsEnabled'
-              className='font-medium text-sm'
-            >
-              Enable Notifications
-            </label>
-          </div>
+          <p className='mb-4 text-gray-400 text-sm'>
+            Set reminders for logging your calories. (Note: Notifications are
+            not available, but you can still use reminders to help you
+            remember.)
+          </p>
 
-          {notificationsEnabled && (
-            <>
-              {/* List existing reminders */}
-              {reminders.length > 0 && (
-                <div className='space-y-2 mb-4'>
-                  {reminders.map((reminder) => (
-                    <div
-                      key={reminder.id}
-                      className='flex justify-between items-center bg-gray-700 p-3 rounded'
-                    >
-                      <div>
-                        <div className='flex items-center gap-2'>
-                          <input
-                            type='checkbox'
-                            checked={reminder.enabled}
-                            onChange={(e) =>
-                              handleToggleReminder(
-                                reminder.id,
-                                e.target.checked
-                              )
-                            }
-                            className='bg-gray-700 border-gray-600 rounded focus:ring-blue-500 text-blue-500'
-                          />
-                          <span className='font-medium'>
-                            {formatTime(reminder.time)}
-                          </span>
-                        </div>
-                        <div className='text-gray-400 text-sm'>
-                          {formatDays(reminder.days)}
-                        </div>
-                        <div className='mt-1 text-sm'>{reminder.message}</div>
-                      </div>
-                      <button
-                        onClick={() => deleteReminder(reminder.id)}
-                        className='text-red-400 hover:text-red-300 text-sm'
-                      >
-                        Remove
-                      </button>
+          {/* List existing reminders */}
+          {reminders.length > 0 && (
+            <div className='space-y-2 mb-4'>
+              {reminders.map((reminder) => (
+                <div
+                  key={reminder.id}
+                  className='flex justify-between items-center bg-gray-700 p-3 rounded'
+                >
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <input
+                        type='checkbox'
+                        checked={reminder.enabled}
+                        onChange={(e) =>
+                          handleToggleReminder(reminder.id, e.target.checked)
+                        }
+                        className='bg-gray-700 border-gray-600 rounded focus:ring-blue-500 text-blue-500'
+                      />
+                      <span className='font-medium'>
+                        {formatTime(reminder.time)}
+                      </span>
                     </div>
+                    <div className='text-gray-400 text-sm'>
+                      {formatDays(reminder.days)}
+                    </div>
+                    <div className='mt-1 text-sm'>{reminder.message}</div>
+                  </div>
+                  <button
+                    onClick={() => deleteReminder(reminder.id)}
+                    className='text-red-400 hover:text-red-300 text-sm'
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add reminder button/form */}
+          {!showAddForm ? (
+            <button
+              onClick={() => setShowAddForm(true)}
+              className='bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm transition-colors'
+            >
+              Add Reminder
+            </button>
+          ) : (
+            <div className='bg-gray-700 p-4 rounded'>
+              <h3 className='mb-3 font-medium'>New Reminder</h3>
+
+              <div className='mb-3'>
+                <label className='block mb-1 text-sm'>Time</label>
+                <input
+                  type='time'
+                  value={newReminderTime}
+                  onChange={(e) => setNewReminderTime(e.target.value)}
+                  className='bg-gray-800 p-2 border border-gray-600 rounded w-full text-gray-100'
+                />
+              </div>
+
+              <div className='mb-3'>
+                <label className='block mb-1 text-sm'>Days</label>
+                <div className='flex flex-wrap gap-2'>
+                  {daysOfWeek.map((day) => (
+                    <button
+                      key={day.id}
+                      onClick={() => handleDayToggle(day.id)}
+                      className={`px-2 py-1 rounded text-xs ${
+                        newReminderDays.includes(day.id)
+                          ? 'bg-blue-600'
+                          : 'bg-gray-600'
+                      }`}
+                    >
+                      {day.label}
+                    </button>
                   ))}
                 </div>
-              )}
+              </div>
 
-              {/* Add reminder button/form */}
-              {!showAddForm ? (
+              <div className='mb-3'>
+                <label className='block mb-1 text-sm'>Message</label>
+                <input
+                  type='text'
+                  value={newReminderMessage}
+                  onChange={(e) => setNewReminderMessage(e.target.value)}
+                  className='bg-gray-800 p-2 border border-gray-600 rounded w-full text-gray-100'
+                  placeholder='Time to log your calories!'
+                />
+              </div>
+
+              <div className='flex gap-2'>
                 <button
-                  onClick={() => setShowAddForm(true)}
-                  className='bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded w-full text-sm transition-colors'
+                  onClick={handleAddReminder}
+                  className='bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm'
                 >
-                  Add Reminder
+                  Save
                 </button>
-              ) : (
-                <div className='space-y-3 bg-gray-700 p-4 rounded'>
-                  <div>
-                    <label
-                      htmlFor='reminderTime'
-                      className='block mb-1 font-medium text-sm'
-                    >
-                      Time
-                    </label>
-                    <input
-                      type='time'
-                      id='reminderTime'
-                      value={newReminderTime}
-                      onChange={(e) => setNewReminderTime(e.target.value)}
-                      className='bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100'
-                    />
-                  </div>
-
-                  <div>
-                    <label className='block mb-1 font-medium text-sm'>
-                      Days
-                    </label>
-                    <div className='flex flex-wrap gap-2'>
-                      {daysOfWeek.map((day) => (
-                        <button
-                          key={day.id}
-                          type='button'
-                          onClick={() => handleDayToggle(day.id)}
-                          className={`px-2 py-1 rounded text-xs ${
-                            newReminderDays.includes(day.id)
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-600 text-gray-300'
-                          }`}
-                        >
-                          {day.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='reminderMessage'
-                      className='block mb-1 font-medium text-sm'
-                    >
-                      Message
-                    </label>
-                    <input
-                      type='text'
-                      id='reminderMessage'
-                      value={newReminderMessage}
-                      onChange={(e) => setNewReminderMessage(e.target.value)}
-                      placeholder='Time to log your calories!'
-                      className='bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100'
-                    />
-                  </div>
-
-                  <div className='flex justify-end gap-2'>
-                    <button
-                      onClick={() => setShowAddForm(false)}
-                      className='bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded text-sm'
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleAddReminder}
-                      className='bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm'
-                    >
-                      Save Reminder
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className='bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded text-sm'
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Data Portability Section */}
-      <div className='bg-gray-800 shadow-lg mt-5 p-6 rounded-lg'>
-        <h2 className='mb-3 font-semibold text-lg'>Data Portability</h2>
-        <DataPortability />
+        {/* Data import/export */}
+        <div className='pt-5 border-gray-700 border-t'>
+          <h2 className='mb-3 font-semibold text-lg'>Data</h2>
+          <DataPortability />
+        </div>
       </div>
     </div>
   );

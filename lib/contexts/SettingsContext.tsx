@@ -31,8 +31,6 @@ interface SettingsContextType {
   addReminder: (reminder: Omit<Reminder, 'id'>) => void;
   updateReminder: (id: string, reminder: Partial<Omit<Reminder, 'id'>>) => void;
   deleteReminder: (id: string) => void;
-  notificationsEnabled: boolean;
-  setNotificationsEnabled: (enabled: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -46,7 +44,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [customModelName, setCustomModelName] = useState('');
   const [debugMode, setDebugMode] = useState(false);
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   // Initialize values from localStorage
   useEffect(() => {
@@ -56,8 +53,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const storedCustomModel = localStorage.getItem('custom_model') || '';
     const storedDebugMode = localStorage.getItem('debug_mode') === 'true';
     const storedReminders = localStorage.getItem('reminders');
-    const storedNotificationsEnabled =
-      localStorage.getItem('notifications_enabled') === 'true';
 
     setApiKey(storedApiKey);
     setTargetCalories(storedCalories ? parseInt(storedCalories) : 0);
@@ -65,7 +60,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setCustomModelName(storedCustomModel);
     setDebugMode(storedDebugMode);
     setReminders(storedReminders ? JSON.parse(storedReminders) : []);
-    setNotificationsEnabled(storedNotificationsEnabled);
   }, []);
 
   // Save settings whenever they change
@@ -76,10 +70,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('custom_model', customModelName);
     localStorage.setItem('debug_mode', debugMode.toString());
     localStorage.setItem('reminders', JSON.stringify(reminders));
-    localStorage.setItem(
-      'notifications_enabled',
-      notificationsEnabled.toString()
-    );
   }, [
     apiKey,
     targetCalories,
@@ -87,7 +77,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     customModelName,
     debugMode,
     reminders,
-    notificationsEnabled,
   ]);
 
   const addReminder = (reminder: Omit<Reminder, 'id'>) => {
@@ -111,16 +100,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setReminders((prev) => prev.filter((r) => r.id !== id));
   };
 
-  // Setup notification permissions
-  useEffect(() => {
-    // Check if the browser supports notifications
-    if ('Notification' in window) {
-      if (notificationsEnabled && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
-    }
-  }, [notificationsEnabled]);
-
   return (
     <SettingsContext.Provider
       value={{
@@ -138,8 +117,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         addReminder,
         updateReminder,
         deleteReminder,
-        notificationsEnabled,
-        setNotificationsEnabled,
       }}
     >
       {children}
