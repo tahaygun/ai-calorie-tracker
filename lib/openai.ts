@@ -30,7 +30,9 @@ export interface AnalysisResponse {
       model: string;
       messages: Array<{
         role: 'user' | 'assistant' | 'system';
-        content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
+        content:
+          | string
+          | Array<{ type: string; text?: string; image_url?: { url: string } }>;
       }>;
       temperature: number;
       response_format: { type: string };
@@ -51,7 +53,7 @@ export class OpenAIService {
   }
 
   async analyzeFoodData(description: string): Promise<AnalysisResponse> {
-    const prompt = `Analyze the following meal description and provide nutritional information for each item. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values. If the description is not clear, provide the best guess. 
+    const prompt = `Analyze the following meal description and provide nutritional information for each item. Combine them if you think they are the same item or they are a meal together. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values. If the description is not clear, provide the best guess. 
     ${exampleResponse}
     
     Meal description: "${description}"`;
@@ -89,7 +91,10 @@ export class OpenAIService {
     return result;
   }
 
-  async analyzeImageData(base64Image: string, description?: string): Promise<AnalysisResponse> {
+  async analyzeImageData(
+    base64Image: string,
+    description?: string
+  ): Promise<AnalysisResponse> {
     const prompt = description
       ? `Analyze this food image with the provided description together: "${description}". Provide nutritional information for each visible item on the image, even if it is not listed in the description. Use the description as helper. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.`
       : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", and "fiber" (all in grams except calories). Be precise and realistic with the values.';
