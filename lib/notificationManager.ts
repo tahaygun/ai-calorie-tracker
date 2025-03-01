@@ -35,6 +35,27 @@ export function createNotificationManager(): NotificationManager {
         '/notification-worker.js'
       );
 
+      // Request permission for periodic sync if available
+      if ('periodicSync' in serviceWorkerRegistration) {
+        try {
+          const status = await navigator.permissions.query({
+            name: 'periodic-background-sync' as PermissionName,
+          });
+
+          if (status.state === 'granted') {
+            // @ts-expect-error - TypeScript may not recognize this API yet
+            await serviceWorkerRegistration.periodicSync.register(
+              'refresh-reminders',
+              {
+                minInterval: 60 * 60 * 1000, // 1 hour
+              }
+            );
+          }
+        } catch (error) {
+          console.log('Periodic sync not supported:', error);
+        }
+      }
+
       // Setup listener for messages from the service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'GET_REMINDERS') {

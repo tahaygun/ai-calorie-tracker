@@ -4,10 +4,88 @@
 // Store for active notification timers
 const activeTimers = new Map();
 
+// IndexedDB setup
+const DB_NAME = 'calorieTrackerDB';
+const STORE_NAME = 'reminders';
+let db;
+
+// Initialize IndexedDB
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+
+    request.onerror = (event) => {
+      console.error('IndexedDB error:', event.target.error);
+      reject(event.target.error);
+    };
+
+    request.onsuccess = (event) => {
+      db = event.target.result;
+      resolve(db);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// Save reminders to IndexedDB
+async function saveRemindersToIndexedDB(reminders) {
+  if (!db) await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+
+    // Clear existing reminders
+    const clearRequest = store.clear();
+
+    clearRequest.onsuccess = () => {
+      // Add each reminder
+      if (Array.isArray(reminders)) {
+        reminders.forEach((reminder) => {
+          if (reminder.enabled) {
+            store.add(reminder);
+          }
+        });
+      }
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject(event.target.error);
+    };
+  });
+}
+
+// Get reminders from IndexedDB
+async function getRemindersFromIndexedDB() {
+  if (!db) await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+}
+
 // Listen for messages from the main app
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'UPDATE_REMINDERS') {
-    updateReminders(event.data.reminders);
+    // Save reminders to IndexedDB and update active timers
+    saveRemindersToIndexedDB(event.data.reminders)
+      .then(() => updateReminders(event.data.reminders))
+      .catch((error) => console.error('Error saving reminders:', error));
   }
 });
 
@@ -108,17 +186,37 @@ function showNotification(reminder) {
 // Initial setup when service worker activates
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    // Get reminders from storage and set them up
-    self.registration.active &&
-      self.clients.claim().then(() => {
-        // Request reminders from main thread if available
-        self.clients.matchAll().then((clients) => {
+    initDB()
+      .then(() => self.clients.claim())
+      .then(() => {
+        // Try to get clients first
+        return self.clients.matchAll().then((clients) => {
           if (clients.length > 0) {
-            clients[0].postMessage({
-              type: 'GET_REMINDERS',
+            // If clients exist, request reminders from main thread
+            clients[0].postMessage({ type: 'GET_REMINDERS' });
+            return Promise.resolve();
+          } else {
+            // If no clients, load reminders from IndexedDB
+            return getRemindersFromIndexedDB().then((reminders) => {
+              if (reminders && reminders.length > 0) {
+                updateReminders(reminders);
+              }
             });
           }
         });
       })
   );
+});
+
+// Periodically check for reminders (backup mechanism)
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'refresh-reminders') {
+    event.waitUntil(
+      getRemindersFromIndexedDB().then((reminders) => {
+        if (reminders && reminders.length > 0) {
+          updateReminders(reminders);
+        }
+      })
+    );
+  }
 });
