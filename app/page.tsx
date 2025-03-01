@@ -26,6 +26,8 @@ export default function Home() {
     addMeal,
     deleteMeal,
     updateItemNutrition,
+    updateItemName,
+    removeItem,
   } = useMeals();
 
   const { apiKey, targetCalories } = useSettings();
@@ -136,6 +138,8 @@ export default function Home() {
             <NutritionEditor
               items={editableItems}
               onUpdateItem={updateItemNutrition}
+              onUpdateItemName={updateItemName}
+              onRemoveItem={removeItem}
               onConfirm={handleConfirmMeal}
               onCancel={() => {
                 setIsEditing(false);

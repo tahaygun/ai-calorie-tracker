@@ -1,5 +1,5 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MealEntry, NutritionTotals } from '../types';
 
 export function useMeals() {
@@ -83,7 +83,11 @@ export function useMeals() {
     setDailyMeals((prev) => prev.filter((meal) => meal.id !== id));
   };
 
-  const updateItemNutrition = (itemIndex: number, field: keyof NutritionData, value: number) => {
+  const updateItemNutrition = (
+    itemIndex: number,
+    field: keyof NutritionData,
+    value: number
+  ) => {
     setEditableItems((items) =>
       items.map((item, index) =>
         index === itemIndex
@@ -96,6 +100,25 @@ export function useMeals() {
             }
           : item
       )
+    );
+  };
+
+  const updateItemName = (itemIndex: number, newName: string) => {
+    setEditableItems((items) =>
+      items.map((item, index) =>
+        index === itemIndex
+          ? {
+              ...item,
+              item: newName,
+            }
+          : item
+      )
+    );
+  };
+
+  const removeItem = (itemIndex: number) => {
+    setEditableItems((items) =>
+      items.filter((_, index) => index !== itemIndex)
     );
   };
 
@@ -113,5 +136,7 @@ export function useMeals() {
     addMeal,
     deleteMeal,
     updateItemNutrition,
+    updateItemName,
+    removeItem,
   };
 }
