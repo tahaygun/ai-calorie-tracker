@@ -3,6 +3,7 @@
 import { useSettings } from '@/lib/contexts/SettingsContext';
 import Link from 'next/link';
 import { useState } from 'react';
+import DataPortability from '../components/DataPortability';
 
 export default function SettingsPage() {
   const {
@@ -374,6 +375,12 @@ export default function SettingsPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Data Portability Section */}
+      <div className='bg-gray-800 shadow-lg mt-5 p-6 rounded-lg'>
+        <h2 className='mb-3 font-semibold text-lg'>Data Portability</h2>
+        <DataPortability />
       </div>
     </div>
   );
