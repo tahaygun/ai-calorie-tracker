@@ -1,4 +1,10 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
+import { useEffect, useRef, useState } from 'react';
+
+// Extend NutritionData to include grams
+type ExtendedNutritionData = NutritionData & {
+  grams: number;
+};
 
 interface NutritionEditorProps {
   items: FoodItemNutrition[];
@@ -17,8 +23,85 @@ export default function NutritionEditor({
   onConfirm,
   onCancel,
 }: NutritionEditorProps) {
+  // Store original nutrition values per gram for each item
+  const initialNutritionPerGram = useRef<(ExtendedNutritionData | null)[]>([]);
+
+  // Track whether we're in the middle of changing a value
+  const [activeChange, setActiveChange] = useState<{
+    itemIndex: number;
+    field: string;
+    value: string; // Store as string to allow empty input
+  } | null>(null);
+
+  // Initialize the per-gram nutrition values
+  useEffect(() => {
+    initialNutritionPerGram.current = items.map((item) => {
+      const nutrition = item.nutrition as ExtendedNutritionData;
+      if (!nutrition.grams || nutrition.grams === 0) {
+        return null;
+      }
+
+      // Calculate per gram values
+      const perGramValues: ExtendedNutritionData = {
+        calories: nutrition.calories / nutrition.grams,
+        protein: nutrition.protein / nutrition.grams,
+        carbs: nutrition.carbs / nutrition.grams,
+        fat: nutrition.fat / nutrition.grams,
+        fiber: nutrition.fiber / nutrition.grams,
+        grams: 1, // 1 gram per gram
+      };
+
+      return perGramValues;
+    });
+  }, [items]);
+
+  // Handle input change without immediate update
+  const handleInputChange = (
+    itemIndex: number,
+    field: string,
+    value: string
+  ) => {
+    setActiveChange({ itemIndex, field, value });
+  };
+
+  // Commit the change and update all values when needed
+  const commitChange = () => {
+    if (!activeChange) return;
+
+    const { itemIndex, field, value } = activeChange;
+
+    // Convert to number only when committing, if empty string use 0
+    const numericValue = value === '' ? 0 : parseFloat(value) || 0;
+
+    // If we're updating grams, scale all other values
+    if (field === 'grams' && initialNutritionPerGram.current[itemIndex]) {
+      const perGramValues = initialNutritionPerGram.current[itemIndex];
+      if (perGramValues) {
+        // Update all nutrition values based on grams
+        Object.keys(perGramValues).forEach((nutrientKey) => {
+          if (nutrientKey !== 'grams') {
+            const scaledValue =
+              perGramValues[nutrientKey as keyof ExtendedNutritionData] *
+              numericValue;
+            onUpdateItem(
+              itemIndex,
+              nutrientKey as keyof NutritionData,
+              scaledValue
+            );
+          }
+        });
+      }
+    }
+
+    // Update the requested field
+    onUpdateItem(itemIndex, field as keyof NutritionData, numericValue);
+
+    // Clear the active change
+    setActiveChange(null);
+  };
+
   return (
-    <div className='border-gray-700 bg-gray-800 p-3 border rounded'>
+    <div className='bg-gray-800 p-3 border border-gray-700 rounded'>
       <h2 className='mb-2 font-semibold text-sm'>
         Verify Nutrition Information
       </h2>
@@ -34,15 +117,25 @@ export default function NutritionEditor({
                   </label>
                   <input
                     type='number'
-                    value={value}
-                    onChange={(e) =>
-                      onUpdateItem(
-                        itemIndex,
-                        key as keyof NutritionData,
-                        parseFloat(e.target.value) || 0
-                      )
+                    value={
+                      activeChange &&
+                      activeChange.itemIndex === itemIndex &&
+                      activeChange.field === key
+                        ? activeChange.value
+                        : value.toString()
                     }
-                    className='border-gray-500 bg-gray-600 px-2 py-1 border rounded w-full text-gray-100 text-sm'
+                    onChange={(e) => {
+                      handleInputChange(itemIndex, key, e.target.value);
+                    }}
+                    onBlur={() => {
+                      commitChange();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        commitChange();
+                      }
+                    }}
+                    className='bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full text-gray-100 text-sm'
                   />
                 </div>
               ))}
@@ -51,7 +144,7 @@ export default function NutritionEditor({
         ))}
       </div>
       {items.length > 1 ? (
-        <div className='border-gray-600 mt-2.5 pt-2 border-t'>
+        <div className='mt-2.5 pt-2 border-gray-600 border-t'>
           <div className='gap-2 grid grid-cols-3 md:grid-cols-5 text-xs'>
             {Object.keys(items[0]?.nutrition || {}).map((key) => {
               const total = items.reduce(
