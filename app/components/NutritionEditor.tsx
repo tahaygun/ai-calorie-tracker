@@ -104,9 +104,12 @@ export default function NutritionEditor({
         // Update all nutrition values based on grams
         Object.keys(perGramValues).forEach((nutrientKey) => {
           if (nutrientKey !== 'grams') {
-            const scaledValue =
-              perGramValues[nutrientKey as keyof ExtendedNutritionData] *
-              numericValue;
+            const scaledValue = parseFloat(
+              (
+                perGramValues[nutrientKey as keyof ExtendedNutritionData] *
+                numericValue
+              ).toFixed(2)
+            );
             onUpdateItem(
               itemIndex,
               nutrientKey as keyof NutritionData,
