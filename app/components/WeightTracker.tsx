@@ -14,7 +14,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
 // Instead of registering at module level, we'll register in an effect
@@ -60,6 +60,64 @@ export default function WeightTracker() {
       day: 'numeric',
     }).format(date);
   };
+
+  // Calculate weight statistics
+  const weightStats = useMemo(() => {
+    if (weights.length === 0) return null;
+
+    const sortedEntries = [...weights].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    const firstEntry = sortedEntries[0];
+    const lastEntry = sortedEntries[sortedEntries.length - 1];
+
+    const startWeight = firstEntry.weight;
+    const currentWeight = lastEntry.weight;
+    const weightChange = currentWeight - startWeight;
+    const weightChangePercent = (weightChange / startWeight) * 100;
+
+    // Calculate progress towards target if target weight is set
+    let progressPercent = 0;
+    if (targetWeight > 0) {
+      // Different calculation based on whether we're trying to lose or gain weight
+      if (startWeight > targetWeight) {
+        // Weight loss goal
+        const totalToLose = startWeight - targetWeight;
+        const lost = startWeight - currentWeight;
+        progressPercent = Math.min(
+          100,
+          Math.max(0, (lost / totalToLose) * 100)
+        );
+      } else if (startWeight < targetWeight) {
+        // Weight gain goal
+        const totalToGain = targetWeight - startWeight;
+        const gained = currentWeight - startWeight;
+        progressPercent = Math.min(
+          100,
+          Math.max(0, (gained / totalToGain) * 100)
+        );
+      } else {
+        // Already at target
+        progressPercent = 100;
+      }
+    }
+
+    return {
+      startWeight,
+      currentWeight,
+      weightChange,
+      weightChangePercent,
+      progressPercent,
+      entries: sortedEntries.length,
+      isWeightLoss: startWeight > targetWeight,
+      duration: Math.ceil(
+        (new Date(lastEntry.date).getTime() -
+          new Date(firstEntry.date).getTime()) /
+          (1000 * 60 * 60 * 24)
+      ),
+    };
+  }, [weights, targetWeight]);
 
   // Prepare chart data
   useEffect(() => {
@@ -129,12 +187,126 @@ export default function WeightTracker() {
     }
   };
 
+  // Helper function to get the previous weight entry for comparison
+  const getPreviousEntry = (currentEntry: WeightEntry): WeightEntry | null => {
+    if (weights.length <= 1) return null;
+
+    const sortedEntries = [...weights].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    const currentIndex = sortedEntries.findIndex(
+      (entry) => entry.id === currentEntry.id
+    );
+    if (currentIndex <= 0) return null;
+
+    return sortedEntries[currentIndex - 1];
+  };
+
   if (isLoading) {
     return <div className='py-4 text-center'>Loading weight data...</div>;
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-5'>
+      {weightStats && (
+        <div className='bg-gray-800 shadow-lg p-4 rounded-lg'>
+          <div className='gap-2 grid grid-cols-3 mb-3'>
+            <div className='bg-gray-700 p-2 rounded-lg text-center'>
+              <div className='text-gray-400 text-xs'>Start</div>
+              <div className='font-bold text-base sm:text-lg'>
+                {weightStats.startWeight} kg
+              </div>
+            </div>
+
+            <div className='bg-gray-700 p-2 rounded-lg text-center'>
+              <div className='text-gray-400 text-xs'>Current</div>
+              <div className='font-bold text-base sm:text-lg'>
+                {weightStats.currentWeight} kg
+              </div>
+            </div>
+
+            <div className='bg-gray-700 p-2 rounded-lg text-center'>
+              <div className='text-gray-400 text-xs'>Change</div>
+              <div
+                className={`font-bold text-base sm:text-lg flex items-center justify-center ${
+                  weightStats.weightChange === 0
+                    ? 'text-gray-300'
+                    : weightStats.weightChange < 0
+                    ? 'text-green-400'
+                    : 'text-red-400'
+                }`}
+              >
+                {weightStats.weightChange > 0 ? '+' : ''}
+                {weightStats.weightChange.toFixed(1)}
+                {weightStats.weightChange !== 0 && (
+                  <span className='ml-1'>
+                    {weightStats.weightChange < 0 ? (
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='w-4 h-4'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='w-4 h-4'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    )}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {targetWeight > 0 && (
+            <div>
+              <div className='flex justify-between items-center mb-1 text-xs'>
+                <span className='text-gray-400'>
+                  Progress: {weightStats.progressPercent.toFixed(0)}%
+                </span>
+                <span className='text-gray-400'>
+                  {Math.abs(targetWeight - weightStats.currentWeight).toFixed(
+                    1
+                  )}{' '}
+                  kg to go
+                </span>
+              </div>
+              <div className='bg-gray-700 mb-1 rounded-full w-full h-2'>
+                <div
+                  className='rounded-full h-2 transition-all duration-500'
+                  style={{
+                    width: `${weightStats.progressPercent}%`,
+                    backgroundColor: weightStats.isWeightLoss
+                      ? '#4ade80'
+                      : '#8b5cf6',
+                  }}
+                ></div>
+              </div>
+              <div className='flex justify-between text-gray-400 text-xs'>
+                <div>{weightStats.startWeight} kg</div>
+                <div>{targetWeight} kg</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className='bg-gray-800 shadow-lg p-6 rounded-lg'>
         <h2 className='mb-4 font-semibold text-xl'>Track Your Weight</h2>
 
@@ -275,45 +447,68 @@ export default function WeightTracker() {
                 (a, b) =>
                   new Date(b.date).getTime() - new Date(a.date).getTime()
               ) // Sort by date, newest first
-              .map((entry: WeightEntry) => (
-                <div
-                  key={entry.id}
-                  className='flex justify-between items-center bg-gray-700 hover:bg-gray-650 p-3 rounded transition-colors'
-                >
-                  <div>
-                    <div className='font-medium'>{entry.weight} kg</div>
-                    <div className='text-gray-400 text-sm'>
-                      {formatDate(entry.date)}
-                    </div>
-                    {entry.note && (
-                      <div className='mt-1 text-gray-300 text-xs'>
-                        {entry.note}
+              .map((entry: WeightEntry) => {
+                const prevEntry = getPreviousEntry(entry);
+                const weightDiff = prevEntry
+                  ? entry.weight - prevEntry.weight
+                  : 0;
+
+                return (
+                  <div
+                    key={entry.id}
+                    className='flex justify-between items-center bg-gray-700 hover:bg-gray-650 p-3 rounded transition-colors'
+                  >
+                    <div className='flex-1'>
+                      <div className='flex items-center font-medium'>
+                        {entry.weight} kg
+                        {prevEntry && (
+                          <span
+                            className={`ml-2 text-sm ${
+                              weightDiff === 0
+                                ? 'text-gray-400'
+                                : weightDiff < 0
+                                ? 'text-green-400'
+                                : 'text-red-400'
+                            }`}
+                          >
+                            {weightDiff > 0 ? '+' : ''}
+                            {weightDiff.toFixed(1)} kg
+                          </span>
+                        )}
                       </div>
+                      <div className='text-gray-400 text-sm'>
+                        {formatDate(entry.date)}
+                      </div>
+                      {entry.note && (
+                        <div className='mt-1 text-gray-300 text-xs'>
+                          {entry.note}
+                        </div>
+                      )}
+                    </div>
+
+                    {editMode && (
+                      <button
+                        onClick={() => handleDeleteEntry(entry.id)}
+                        className='text-red-400 hover:text-red-300 transition-colors'
+                        aria-label='Delete entry'
+                      >
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='w-5 h-5'
+                          viewBox='0 0 20 20'
+                          fill='currentColor'
+                        >
+                          <path
+                            fillRule='evenodd'
+                            d='M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z'
+                            clipRule='evenodd'
+                          />
+                        </svg>
+                      </button>
                     )}
                   </div>
-
-                  {editMode && (
-                    <button
-                      onClick={() => handleDeleteEntry(entry.id)}
-                      className='text-red-400 hover:text-red-300 transition-colors'
-                      aria-label='Delete entry'
-                    >
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='w-5 h-5'
-                        viewBox='0 0 20 20'
-                        fill='currentColor'
-                      >
-                        <path
-                          fillRule='evenodd'
-                          d='M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z'
-                          clipRule='evenodd'
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
+                );
+              })}
           </div>
         )}
       </div>
