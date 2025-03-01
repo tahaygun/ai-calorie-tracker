@@ -80,9 +80,15 @@ export default function Home() {
   };
 
   const handleConfirmMeal = () => {
+    // If meal description is empty, create one from the item names
+    let finalDescription = mealDescription;
+    if (!finalDescription && editableItems.length > 0) {
+      finalDescription = editableItems.map((item) => item.item).join(', ');
+    }
+
     addMeal({
       id: Date.now().toString(),
-      description: mealDescription,
+      description: finalDescription,
       items: editableItems,
       timestamp: new Date().toISOString(),
     });
