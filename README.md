@@ -6,11 +6,14 @@ A free, open-source calorie tracking application powered by AI. Track your daily
 
 ## 🌟 Features
 
-- **AI-Powered Analysis**: Get instant nutritional information for any food or meal using OpenAI's advanced language models
-- **Model Selection**: Choose between GPT-4 (most accurate), GPT-3.5 Turbo (faster), or use your own custom model
+- **AI-Powered Text Analysis**: Get instant nutritional information for any food or meal using OpenAI's advanced language models
+- **Image Analysis**: Upload food photos for automatic analysis and nutritional breakdown
+- **Enhanced Model Selection**: Choose from GPT-4o-mini (recommended), GPT-4o, GPT-3.5 Turbo, GPT-4, or use your own custom model
 - **No Account Required**: Start tracking immediately - no sign-up, no hassle
 - **Daily Summaries**: View your daily calorie and nutrition totals
 - **Favorites System**: Save your frequently eaten meals for quick access
+- **Data Portability**: Export and import your nutrition data for backup or transfer between devices
+- **Debug Mode**: View token usage and detailed analysis information for technical users
 - **PWA Support**: Install as a mobile app on any device
 - **Offline Capable**: Continue using the app even without internet
 - **Dark Theme**: Easy on the eyes with a modern dark interface
@@ -74,11 +77,50 @@ npm start
 
 The app supports multiple OpenAI models:
 
-- **GPT-4**: Most accurate nutritional analysis but slower and more expensive
-- **GPT-3.5 Turbo**: Good balance of accuracy and speed
+- **GPT-4o-mini**: Recommended for most users - good balance of speed, cost and accuracy
+- **GPT-4o**: Latest model with excellent nutritional analysis capabilities
+- **GPT-3.5 Turbo**: Faster and less expensive option
+- **GPT-4**: Original high-accuracy model
 - **Custom Models**: Use your own fine-tuned models or other OpenAI models
 
-You can change models in the Settings modal, accessible from the main page.
+You can change models in the Settings page, accessible from the main navigation.
+
+## 📷 Image Analysis
+
+The app now supports food image analysis:
+
+1. Click the camera icon in the meal input form
+2. Upload a photo of your food
+3. The AI will analyze the image and identify food items
+4. Review and adjust the nutritional information as needed
+5. Add the meal to your daily log
+
+Tips for best image analysis results:
+
+- Ensure good lighting and clear visibility of all food items
+- Take photos from above to show all items on the plate
+- For packaged foods, consider including the nutrition label in the image
+- Images are compressed automatically for faster upload and processing
+
+## 💾 Data Portability
+
+The app now features data import and export capabilities:
+
+- **Export Data**: Back up all your meal data, favorites, and settings
+- **Import Data**: Restore your data on a new device or after clearing your browser
+- **Privacy-Focused**: All data transfers happen locally with no server involvement
+
+Access these features from the Settings page under "Data Management".
+
+## 🔍 Debug Mode
+
+For technical users or troubleshooting:
+
+- **Token Usage Tracking**: View prompt and completion tokens used for API calls
+- **Detailed Response Information**: See how the AI interpreted your food descriptions
+- **Performance Optimization**: Useful for minimizing API costs or identifying issues
+
+Enable Debug Mode in the Settings page.
 
 ## 🤝 Contributing
 
