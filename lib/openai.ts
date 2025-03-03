@@ -53,7 +53,7 @@ export class OpenAIService {
   }
 
   async analyzeFoodData(description: string): Promise<AnalysisResponse> {
-    const prompt = `Analyze the following meal description and provide nutritional information for each item. Combine them if you think they are the same item or they are a meal together. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Estimate the grams of each item if it is not mentioned. Be precise and realistic with the values. If the description is not clear, provide the best guess. 
+    const prompt = `Analyze the following meal description and provide nutritional information for each item. Combine them if you think they are the same item. If it is a meal, combine them and provide the nutritional information for the meal. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Estimate the grams of each item if it is not mentioned. Be precise and realistic with the values. If the description is not clear, provide the best guess. 
     ${exampleResponse}
     
     Meal description: "${description}"`;
@@ -70,7 +70,7 @@ export class OpenAIService {
 
     const parsedResponse = JSON.parse(content);
     const result: AnalysisResponse = {
-      data: parsedResponse.meal || [],
+      data: parsedResponse.meal || parsedResponse.items || [],
     };
 
     if (this.debug) {
@@ -96,8 +96,8 @@ export class OpenAIService {
     description?: string
   ): Promise<AnalysisResponse> {
     const prompt = description
-      ? `Analyze this food image with the provided description together: "${description}". Provide nutritional information for each visible item on the image, even if it is not listed in the description. Use the description as helper. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.`
-      : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.';
+      ? `Analyze this food image with this provided description together: "${description}". Provide nutritional information for each visible item on the image. Use the description as helper. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. If it is a meal, combine them and provide the nutritional information for the meal as one item, don't split into ingredients. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.`
+      : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. If it is a meal, combine them and provide the nutritional information for the meal as one item, don\'t split into ingredients. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.';
 
     const response = await this.client.chat.completions.create({
       model: this.model,
@@ -125,12 +125,12 @@ export class OpenAIService {
 
     const parsedResponse = JSON.parse(content);
     const result: AnalysisResponse = {
-      data: parsedResponse.items || [],
+      data: parsedResponse.items || parsedResponse.meal || [],
     };
 
     if (this.debug) {
       result.debugInfo = {
-        rawResponse: response,
+        rawResponse: JSON.parse(content),
         totalTokens: response.usage?.total_tokens || 0,
         promptTokens: response.usage?.prompt_tokens || 0,
         completionTokens: response.usage?.completion_tokens || 0,
