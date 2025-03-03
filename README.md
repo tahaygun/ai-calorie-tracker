@@ -10,6 +10,8 @@ A free, open-source calorie tracking application powered by AI. Track your daily
 - **Image Analysis**: Upload food photos for automatic analysis and nutritional breakdown
 - **Weight Tracking**: Monitor your weight progress with an interactive chart and set target weight goals
 - **Enhanced Model Selection**: Choose from GPT-4o-mini (recommended), GPT-4o, GPT-3.5 Turbo, GPT-4, or use your own custom model
+- **Customizable Analysis Prompts**: Tailor the text and image analysis prompts to improve results for your specific needs
+- **Chronological Meal Display**: View your meals in chronological order with newest entries at the top
 - **No Account Required**: Start tracking immediately - no sign-up, no hassle
 - **Daily Summaries**: View your daily calorie and nutrition totals
 - **Favorites System**: Save your frequently eaten meals for quick access
@@ -85,6 +87,17 @@ The app supports multiple OpenAI models:
 - **Custom Models**: Use your own fine-tuned models or other OpenAI models
 
 You can change models in the Settings page, accessible from the main navigation.
+
+## 🧠 Custom Analysis Prompts
+
+The app now supports customizable analysis prompts:
+
+- **Text Analysis Prompt**: Customize how the AI interprets your text descriptions
+- **Image Analysis Prompt**: Tailor the AI's approach to analyzing food images
+- **Prompt Export/Import**: Your custom prompts are included in data export/import
+- **Default Restoration**: Easily reset to the app's optimized default prompts
+
+Customize these in the Settings page under "AI Customization".
 
 ## 📷 Image Analysis
 

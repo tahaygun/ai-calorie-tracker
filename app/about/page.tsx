@@ -59,6 +59,24 @@ export default function AboutPage() {
       </section>
 
       <section className="mb-8">
+        <h2 className="mb-4 font-semibold text-2xl">Custom Analysis Prompts</h2>
+        <div className="space-y-4">
+          <p>Personalize how the AI analyzes your food:</p>
+          <ul className="space-y-2 pl-6 list-disc">
+            <li>Customize text analysis prompts to better match your eating habits</li>
+            <li>Tailor image analysis prompts for improved photo recognition</li>
+            <li>Custom prompts are included when you export your data</li>
+            <li>Easily restore default prompts optimized for nutrition analysis</li>
+            <li>Find these options in Settings under "AI Customization"</li>
+          </ul>
+          <p className="text-gray-400 text-sm">
+            Tip: If you frequently eat regional foods or follow a special diet, customizing prompts
+            can significantly improve analysis accuracy.
+          </p>
+        </div>
+      </section>
+
+      <section className="mb-8">
         <h2 className="mb-4 font-semibold text-2xl">Image Analysis</h2>
         <div className="space-y-4">
           <p>The app now supports analyzing food images:</p>
