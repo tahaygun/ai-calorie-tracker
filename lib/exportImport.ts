@@ -8,6 +8,8 @@ export interface UserData {
     customModelName: string;
     debugMode: boolean;
     targetWeight: number;
+    textAnalysisPrompt?: string; // Added for prompt customization
+    imageAnalysisPrompt?: string; // Added for prompt customization
   };
   favorites: MealEntry[];
   mealHistory: Record<string, MealEntry[]>;
@@ -39,6 +41,8 @@ export function exportUserData(): UserData {
   const customModelName = localStorage.getItem('custom_model') || '';
   const debugMode = localStorage.getItem('debug_mode') === 'true';
   const targetWeight = parseFloat(localStorage.getItem('target_weight') || '0');
+  const textAnalysisPrompt = localStorage.getItem('text_analysis_prompt') || undefined;
+  const imageAnalysisPrompt = localStorage.getItem('image_analysis_prompt') || undefined;
 
   // Extract favorites
   const favorites = JSON.parse(localStorage.getItem('favorite_meals') || '[]') as MealEntry[];
@@ -54,6 +58,8 @@ export function exportUserData(): UserData {
       customModelName,
       debugMode,
       targetWeight,
+      textAnalysisPrompt,
+      imageAnalysisPrompt,
     },
     favorites,
     mealHistory,
@@ -78,6 +84,15 @@ export function importUserData(userData: UserData, options = { includeApiKey: fa
   // Import target weight if present (handling backward compatibility)
   if ('targetWeight' in userData.settings) {
     localStorage.setItem('target_weight', userData.settings.targetWeight.toString());
+  }
+
+  // Import prompt settings if available
+  if (userData.settings.textAnalysisPrompt) {
+    localStorage.setItem('text_analysis_prompt', userData.settings.textAnalysisPrompt);
+  }
+
+  if (userData.settings.imageAnalysisPrompt) {
+    localStorage.setItem('image_analysis_prompt', userData.settings.imageAnalysisPrompt);
   }
 
   // Import favorites
