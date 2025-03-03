@@ -18,7 +18,7 @@ const DynamicWeightTracker = dynamic(
 
 export default function WeightPage() {
   return (
-    <div className='mx-auto px-4 py-6 max-w-4xl container'>
+    <div className='bg-gray-900 mx-auto px-4 py-6 max-w-4xl container'>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='font-bold text-2xl'>Weight Tracker</h1>
         <Link
