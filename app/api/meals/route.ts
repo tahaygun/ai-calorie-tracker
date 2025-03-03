@@ -9,18 +9,12 @@ export async function POST(request: Request) {
     const textAnalysisPrompt = request.headers.get('X-Text-Analysis-Prompt');
 
     if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenAI API key is required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'OpenAI API key is required' }, { status: 401 });
     }
 
     const { description } = await request.json();
     if (!description) {
-      return NextResponse.json(
-        { error: 'Meal description is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Meal description is required' }, { status: 400 });
     }
 
     const openAIService = new OpenAIService({
@@ -38,9 +32,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error processing meal:', error);
-    return NextResponse.json(
-      { error: 'Failed to process meal' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process meal' }, { status: 500 });
   }
 }

@@ -23,10 +23,10 @@ export function exportUserData(): UserData {
   const keys = Object.keys(localStorage);
 
   // Extract meal history (keys like 'meals_2023-01-01')
-  const mealKeys = keys.filter((key) => key.startsWith('meals_'));
+  const mealKeys = keys.filter(key => key.startsWith('meals_'));
   const mealHistory: Record<string, MealEntry[]> = {};
 
-  mealKeys.forEach((key) => {
+  mealKeys.forEach(key => {
     const date = key.replace('meals_', '');
     const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
     mealHistory[date] = meals;
@@ -34,23 +34,17 @@ export function exportUserData(): UserData {
 
   // Extract settings
   const apiKey = localStorage.getItem('openai_api_key') || '';
-  const targetCalories = parseInt(
-    localStorage.getItem('target_calories') || '0'
-  );
+  const targetCalories = parseInt(localStorage.getItem('target_calories') || '0');
   const selectedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
   const customModelName = localStorage.getItem('custom_model') || '';
   const debugMode = localStorage.getItem('debug_mode') === 'true';
   const targetWeight = parseFloat(localStorage.getItem('target_weight') || '0');
 
   // Extract favorites
-  const favorites = JSON.parse(
-    localStorage.getItem('favorite_meals') || '[]'
-  ) as MealEntry[];
+  const favorites = JSON.parse(localStorage.getItem('favorite_meals') || '[]') as MealEntry[];
 
   // Extract weight entries
-  const weightEntries = JSON.parse(
-    localStorage.getItem('weight_entries') || '[]'
-  ) as WeightEntry[];
+  const weightEntries = JSON.parse(localStorage.getItem('weight_entries') || '[]') as WeightEntry[];
 
   return {
     settings: {
@@ -70,29 +64,20 @@ export function exportUserData(): UserData {
 /**
  * Imports user data into localStorage
  */
-export function importUserData(
-  userData: UserData,
-  options = { includeApiKey: false }
-): void {
+export function importUserData(userData: UserData, options = { includeApiKey: false }): void {
   // Import settings
   if (options.includeApiKey) {
     localStorage.setItem('openai_api_key', userData.settings.apiKey);
   }
 
-  localStorage.setItem(
-    'target_calories',
-    userData.settings.targetCalories.toString()
-  );
+  localStorage.setItem('target_calories', userData.settings.targetCalories.toString());
   localStorage.setItem('selected_model', userData.settings.selectedModel);
   localStorage.setItem('custom_model', userData.settings.customModelName);
   localStorage.setItem('debug_mode', userData.settings.debugMode.toString());
 
   // Import target weight if present (handling backward compatibility)
   if ('targetWeight' in userData.settings) {
-    localStorage.setItem(
-      'target_weight',
-      userData.settings.targetWeight.toString()
-    );
+    localStorage.setItem('target_weight', userData.settings.targetWeight.toString());
   }
 
   // Import favorites
@@ -105,10 +90,7 @@ export function importUserData(
 
   // Import weight entries if present (handling backward compatibility)
   if ('weightEntries' in userData) {
-    localStorage.setItem(
-      'weight_entries',
-      JSON.stringify(userData.weightEntries)
-    );
+    localStorage.setItem('weight_entries', JSON.stringify(userData.weightEntries));
   }
 }
 
@@ -126,11 +108,7 @@ export function validateUserData(data: unknown): {
   try {
     // Check for required top-level properties
     const userData = data as Record<string, unknown>;
-    if (
-      !('settings' in userData) ||
-      !('favorites' in userData) ||
-      !('mealHistory' in userData)
-    ) {
+    if (!('settings' in userData) || !('favorites' in userData) || !('mealHistory' in userData)) {
       return {
         valid: false,
         message: 'Invalid data format: missing required sections',

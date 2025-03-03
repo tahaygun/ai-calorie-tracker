@@ -12,10 +12,10 @@ export default function MealList({ meals, onToggleFavorite, onDelete, isFavorite
   if (meals.length === 0) return null;
 
   return (
-    <div className='mt-6'>
-      <h3 className='text-sm font-semibold mb-2'>Logged Meals</h3>
-      <div className='space-y-3'>
-        {meals.map((meal) => (
+    <div className="mt-6">
+      <h3 className="mb-2 font-semibold text-sm">Logged Meals</h3>
+      <div className="space-y-3">
+        {meals.reverse().map(meal => (
           <MealItem
             key={meal.id}
             id={meal.id}

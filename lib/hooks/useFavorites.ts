@@ -20,19 +20,19 @@ export function useFavorites() {
   }, [favorites, firstLoad]);
 
   const toggleFavorite = (meal: MealEntry) => {
-    const isFavorite = favorites.some((fav) => fav.id === meal.id);
+    const isFavorite = favorites.some(fav => fav.id === meal.id);
     if (isFavorite) {
-      setFavorites((prev) => prev.filter((fav) => fav.id !== meal.id));
+      setFavorites(prev => prev.filter(fav => fav.id !== meal.id));
     } else {
-      setFavorites((prev) => [...prev, meal]);
+      setFavorites(prev => [...prev, meal]);
     }
   };
 
   const deleteFavorite = (id: string) => {
-    setFavorites((prev) => prev.filter((meal) => meal.id !== id));
+    setFavorites(prev => prev.filter(meal => meal.id !== id));
   };
 
-  const isMealFavorite = (id: string) => favorites.some((fav) => fav.id === id);
+  const isMealFavorite = (id: string) => favorites.some(fav => fav.id === id);
 
   return {
     favorites,

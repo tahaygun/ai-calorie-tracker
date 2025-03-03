@@ -20,13 +20,11 @@ export default function History() {
   useEffect(() => {
     // Get all localStorage keys
     const keys = Object.keys(localStorage);
-    const mealKeys = keys.filter((key) => key.startsWith('meals_'));
+    const mealKeys = keys.filter(key => key.startsWith('meals_'));
 
-    const totals = mealKeys.map((key) => {
+    const totals = mealKeys.map(key => {
       const date = key.replace('meals_', '');
-      const meals = JSON.parse(
-        localStorage.getItem(key) || '[]'
-      ) as MealEntry[];
+      const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
 
       const dailyTotal = meals.reduce(
         (total: DailyTotal, meal: MealEntry) => {
@@ -55,49 +53,41 @@ export default function History() {
     });
 
     // Sort by date descending
-    totals.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    totals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     setDailyTotals(totals);
   }, []);
 
   const handleDayClick = (date: string) => {
-    const meals = JSON.parse(
-      localStorage.getItem(`meals_${date}`) || '[]'
-    ) as MealEntry[];
+    const meals = JSON.parse(localStorage.getItem(`meals_${date}`) || '[]') as MealEntry[];
     setSelectedDate(date);
     setSelectedMeals(meals);
   };
 
   return (
-    <div className='bg-gray-900 min-h-screen text-gray-100'>
-      <main className='mx-auto p-4 max-w-2xl'>
-        <div className='space-y-4'>
-          <h1 className='mb-4 font-semibold text-xl'>Nutrition History</h1>
+    <div className="bg-gray-900 min-h-screen text-gray-100">
+      <main className="mx-auto p-4 max-w-2xl">
+        <div className="space-y-4">
+          <h1 className="mb-4 font-semibold text-xl">Nutrition History</h1>
           {dailyTotals.length === 0 ? (
-            <p className='text-gray-400'>No history available</p>
+            <p className="text-gray-400">No history available</p>
           ) : (
-            <div className='gap-3 grid'>
-              {dailyTotals.map((day) => (
+            <div className="gap-3 grid">
+              {dailyTotals.map(day => (
                 <button
                   key={day.date}
                   onClick={() => handleDayClick(day.date)}
-                  className='flex justify-between items-center bg-gray-800 hover:bg-gray-750 p-4 rounded-lg w-full text-left transition-colors'
+                  className="flex justify-between items-center bg-gray-800 hover:bg-gray-750 p-4 rounded-lg w-full text-left transition-colors"
                 >
                   <div>
-                    <p className='font-medium'>
-                      {new Date(day.date).toLocaleDateString()}
-                    </p>
-                    <p className='text-gray-400 text-sm'>
-                      P: {Math.round(day.protein)}g • C: {Math.round(day.carbs)}
-                      g • F: {Math.round(day.fat)}g
+                    <p className="font-medium">{new Date(day.date).toLocaleDateString()}</p>
+                    <p className="text-gray-400 text-sm">
+                      P: {Math.round(day.protein)}g • C: {Math.round(day.carbs)}g • F:{' '}
+                      {Math.round(day.fat)}g
                     </p>
                   </div>
-                  <div className='text-right'>
-                    <p className='font-semibold text-lg'>
-                      {Math.round(day.calories)}
-                    </p>
-                    <p className='text-gray-400 text-sm'>calories</p>
+                  <div className="text-right">
+                    <p className="font-semibold text-lg">{Math.round(day.calories)}</p>
+                    <p className="text-gray-400 text-sm">calories</p>
                   </div>
                 </button>
               ))}

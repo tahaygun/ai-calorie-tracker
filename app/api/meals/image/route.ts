@@ -9,10 +9,7 @@ export async function POST(request: Request) {
     const imageAnalysisPrompt = request.headers.get('X-Image-Analysis-Prompt');
 
     if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenAI API key is required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'OpenAI API key is required' }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -20,10 +17,7 @@ export async function POST(request: Request) {
     const description = formData.get('description') as string | null;
 
     if (!imageFile) {
-      return NextResponse.json(
-        { error: 'Image file is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Image file is required' }, { status: 400 });
     }
 
     // Convert file to base64
@@ -38,10 +32,7 @@ export async function POST(request: Request) {
       imageAnalysisPrompt: imageAnalysisPrompt || undefined,
     });
 
-    const result = await openAIService.analyzeImageData(
-      base64Image,
-      description || undefined
-    );
+    const result = await openAIService.analyzeImageData(base64Image, description || undefined);
     console.log(result, 'result');
     return NextResponse.json({
       message: 'Image analyzed successfully',
@@ -50,9 +41,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error processing image:', error);
-    return NextResponse.json(
-      { error: 'Failed to process image' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
 }

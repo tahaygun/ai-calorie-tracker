@@ -47,7 +47,7 @@ export async function compressImage(file: File): Promise<File> {
 
           // Convert to blob with compression
           canvas.toBlob(
-            (blob) => {
+            blob => {
               if (!blob) {
                 reject(new Error('Could not compress image - blob creation failed'));
                 return;
@@ -76,7 +76,7 @@ export async function compressImage(file: File): Promise<File> {
         }
       };
 
-      img.onerror = (err) => {
+      img.onerror = err => {
         URL.revokeObjectURL(objectUrl);
         console.error('Error loading image:', err);
         reject(new Error('Failed to load image. Please make sure the file is a valid image.'));
@@ -109,7 +109,7 @@ export function fileToBase64(file: File): Promise<string> {
         reject(err);
       }
     };
-    reader.onerror = (error) => {
+    reader.onerror = error => {
       console.error('FileReader error:', error);
       reject(error);
     };

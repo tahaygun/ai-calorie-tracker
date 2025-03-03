@@ -5,11 +5,11 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className='bg-gray-800 border-gray-700 border-b'>
-      <div className='mx-auto px-2 sm:px-4 max-w-2xl'>
-        <div className='flex flex-wrap justify-center sm:justify-start space-x-2 sm:space-x-4 h-auto min-h-14'>
+    <nav className="bg-gray-800 border-gray-700 border-b">
+      <div className="mx-auto px-2 sm:px-4 max-w-2xl">
+        <div className="flex flex-wrap justify-center sm:justify-start space-x-2 sm:space-x-4 h-auto min-h-14">
           <Link
-            href='/'
+            href="/"
             className={`inline-flex items-center px-2 sm:px-3 py-2 text-sm ${
               pathname === '/'
                 ? 'text-white border-b-2 border-blue-500'
@@ -19,7 +19,7 @@ export default function Navigation() {
             Today
           </Link>
           <Link
-            href='/history'
+            href="/history"
             className={`inline-flex items-center px-2 sm:px-3 py-2 text-sm ${
               pathname === '/history'
                 ? 'text-white border-b-2 border-blue-500'
@@ -29,7 +29,7 @@ export default function Navigation() {
             History
           </Link>
           <Link
-            href='/weight'
+            href="/weight"
             className={`inline-flex items-center px-2 sm:px-3 py-2 text-sm ${
               pathname === '/weight'
                 ? 'text-white border-b-2 border-blue-500'
@@ -39,7 +39,7 @@ export default function Navigation() {
             Weight
           </Link>
           <Link
-            href='/about'
+            href="/about"
             className={`inline-flex items-center px-2 sm:px-3 py-2 text-sm ${
               pathname === '/about'
                 ? 'text-white border-b-2 border-blue-500'
@@ -49,7 +49,7 @@ export default function Navigation() {
             About
           </Link>
           <Link
-            href='/settings'
+            href="/settings"
             className={`inline-flex items-center px-2 sm:px-3 py-2 text-sm ${
               pathname === '/settings'
                 ? 'text-white border-b-2 border-blue-500'

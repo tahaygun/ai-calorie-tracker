@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface SettingsContextType {
   apiKey: string;
@@ -27,9 +21,7 @@ interface SettingsContextType {
   setImageAnalysisPrompt: (prompt: string) => void;
 }
 
-const SettingsContext = createContext<SettingsContextType | undefined>(
-  undefined
-);
+const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [apiKey, setApiKey] = useState('');

@@ -22,7 +22,7 @@ export default function SettingsPrompt({ type }: SettingsPromptProps) {
     <div className={`mb-4 p-3 ${bgColor} border ${borderColor} rounded`}>
       <p className={`text-sm ${textColor}`}>
         {message}{' '}
-        <Link href='/settings' className={`${linkColor} underline`}>
+        <Link href="/settings" className={`${linkColor} underline`}>
           Open Settings
         </Link>
       </p>

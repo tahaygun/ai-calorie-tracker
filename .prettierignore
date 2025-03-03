@@ -1,0 +1,31 @@
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.eslintcache
+
+# Generated files
+public/sw.js
+public/workbox-*.js
+
+# Coverage reports
+coverage/
+
+# Environment variables
+.env*
+!.env.example
+
+# Other
+.DS_Store
+yarn.lock
+package-lock.json 

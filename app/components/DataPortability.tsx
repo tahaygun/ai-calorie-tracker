@@ -1,8 +1,4 @@
-import {
-  exportUserData,
-  importUserData,
-  validateUserData,
-} from '@/lib/exportImport';
+import { exportUserData, importUserData, validateUserData } from '@/lib/exportImport';
 import { useRef, useState } from 'react';
 
 export default function DataPortability() {
@@ -51,7 +47,7 @@ export default function DataPortability() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       try {
         const jsonData = e.target?.result as string;
         const data = JSON.parse(jsonData);
@@ -64,8 +60,7 @@ export default function DataPortability() {
           importUserData(data, { includeApiKey });
           setImportStatus({
             success: true,
-            message:
-              'Data imported successfully. Reload the page to see changes.',
+            message: 'Data imported successfully. Reload the page to see changes.',
           });
 
           // Reset file input
@@ -91,17 +86,17 @@ export default function DataPortability() {
   };
 
   return (
-    <div className='bg-gray-700 p-4 rounded-lg'>
-      <h2 className='mb-4 font-medium text-lg'>Data Portability</h2>
-      <p className='mb-4 text-gray-300 text-sm'>
-        Export your data to use on another device or create a backup. Import
-        previously exported data to restore your settings and meal history.
+    <div className="bg-gray-700 p-4 rounded-lg">
+      <h2 className="mb-4 font-medium text-lg">Data Portability</h2>
+      <p className="mb-4 text-gray-300 text-sm">
+        Export your data to use on another device or create a backup. Import previously exported
+        data to restore your settings and meal history.
       </p>
 
-      <div className='flex flex-col space-y-4'>
+      <div className="flex flex-col space-y-4">
         <button
           onClick={handleExport}
-          className='bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white transition-colors'
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white transition-colors"
         >
           Export Data
         </button>
@@ -109,32 +104,32 @@ export default function DataPortability() {
         <div>
           <button
             onClick={handleImportClick}
-            className='bg-green-600 hover:bg-green-700 px-4 py-2 rounded w-full text-white transition-colors'
+            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded w-full text-white transition-colors"
           >
             Import Data
           </button>
 
-          <div className='mt-2'>
-            <label className='flex items-center text-sm'>
+          <div className="mt-2">
+            <label className="flex items-center text-sm">
               <input
-                type='checkbox'
+                type="checkbox"
                 checked={includeApiKey}
-                onChange={(e) => setIncludeApiKey(e.target.checked)}
-                className='mr-2'
+                onChange={e => setIncludeApiKey(e.target.checked)}
+                className="mr-2"
               />
               Include API key in import
             </label>
-            <p className='mt-1 text-gray-400 text-xs'>
+            <p className="mt-1 text-gray-400 text-xs">
               When unchecked, your current API key will be preserved.
             </p>
           </div>
 
           <input
-            type='file'
+            type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept='.json'
-            className='hidden'
+            accept=".json"
+            className="hidden"
           />
         </div>
       </div>
@@ -142,9 +137,7 @@ export default function DataPortability() {
       {importStatus && (
         <div
           className={`mt-4 p-3 rounded text-sm ${
-            importStatus.success
-              ? 'bg-green-800 text-green-100'
-              : 'bg-red-800 text-red-100'
+            importStatus.success ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'
           }`}
         >
           {importStatus.message}

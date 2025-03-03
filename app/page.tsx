@@ -32,15 +32,9 @@ export default function Home() {
 
   const { apiKey, targetCalories } = useSettings();
 
-  const { favorites, toggleFavorite, deleteFavorite, isMealFavorite } =
-    useFavorites();
-  const {
-    isLoading,
-    tokenUsage,
-    analyzeMealDescription,
-    analyzeMealImage,
-    clearTokenUsage,
-  } = useNutritionApi();
+  const { favorites, toggleFavorite, deleteFavorite, isMealFavorite } = useFavorites();
+  const { isLoading, tokenUsage, analyzeMealDescription, analyzeMealImage, clearTokenUsage } =
+    useNutritionApi();
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [resetImageUpload, setResetImageUpload] = useState(0);
@@ -77,7 +71,7 @@ export default function Home() {
       console.error('Error analyzing image:', error);
       alert('Error analyzing image. Please check your API key and try again.');
       // Reset the file input
-      setResetImageUpload((prev) => prev + 1);
+      setResetImageUpload(prev => prev + 1);
     }
   };
 
@@ -85,7 +79,7 @@ export default function Home() {
     // If meal description is empty, create one from the item names
     let finalDescription = mealDescription;
     if (!finalDescription && editableItems.length > 0) {
-      finalDescription = editableItems.map((item) => item.item).join(', ');
+      finalDescription = editableItems.map(item => item.item).join(', ');
     }
 
     addMeal({
@@ -108,10 +102,10 @@ export default function Home() {
   };
 
   return (
-    <div className='bg-gray-900 min-h-screen text-gray-100'>
-      <main className='mx-auto p-4 max-w-2xl'>
-        {!apiKey && <SettingsPrompt type='apiKey' />}
-        {!targetCalories && <SettingsPrompt type='calorieTarget' />}
+    <div className="bg-gray-900 min-h-screen text-gray-100">
+      <main className="mx-auto p-4 max-w-2xl">
+        {!apiKey && <SettingsPrompt type="apiKey" />}
+        {!targetCalories && <SettingsPrompt type="calorieTarget" />}
 
         <MealForm
           mealDescription={mealDescription}
@@ -125,16 +119,13 @@ export default function Home() {
         />
 
         {dailyMeals.length > 0 && targetCalories > 0 && (
-          <div className='mt-4 mb-6'>
-            <CalorieProgress
-              totals={calculateDailyTotals()}
-              targetCalories={targetCalories}
-            />
+          <div className="mt-4 mb-6">
+            <CalorieProgress totals={calculateDailyTotals()} targetCalories={targetCalories} />
           </div>
         )}
 
         {isEditing && editableItems.length > 0 ? (
-          <div className='mt-6'>
+          <div className="mt-6">
             <NutritionEditor
               items={editableItems}
               onUpdateItem={updateItemNutrition}
@@ -149,8 +140,8 @@ export default function Home() {
             />
           </div>
         ) : (
-          <div className='mt-6'>
-            <p className='text-gray-400'>No items to edit</p>
+          <div className="mt-6">
+            <p className="text-gray-400">No items to edit</p>
           </div>
         )}
 

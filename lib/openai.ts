@@ -1,9 +1,5 @@
 import OpenAI from 'openai';
-import {
-  DEFAULT_IMAGE_PROMPT,
-  DEFAULT_TEXT_PROMPT,
-  EXAMPLE_RESPONSE,
-} from './constants/prompts';
+import { DEFAULT_IMAGE_PROMPT, DEFAULT_TEXT_PROMPT, EXAMPLE_RESPONSE } from './constants/prompts';
 
 export interface NutritionData {
   calories: number;
@@ -37,9 +33,7 @@ export interface AnalysisResponse {
       model: string;
       messages: Array<{
         role: 'user' | 'assistant' | 'system';
-        content:
-          | string
-          | Array<{ type: string; text?: string; image_url?: { url: string } }>;
+        content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
       }>;
       temperature: number;
       response_format: { type: string };
@@ -60,8 +54,7 @@ export class OpenAIService {
     this.model = config.model;
     this.debug = config.debug || false;
     this.textAnalysisPrompt = config.textAnalysisPrompt || DEFAULT_TEXT_PROMPT;
-    this.imageAnalysisPrompt =
-      config.imageAnalysisPrompt || DEFAULT_IMAGE_PROMPT;
+    this.imageAnalysisPrompt = config.imageAnalysisPrompt || DEFAULT_IMAGE_PROMPT;
   }
 
   async analyzeFoodData(description: string): Promise<AnalysisResponse> {
@@ -103,10 +96,7 @@ export class OpenAIService {
     return result;
   }
 
-  async analyzeImageData(
-    base64Image: string,
-    description?: string
-  ): Promise<AnalysisResponse> {
+  async analyzeImageData(base64Image: string, description?: string): Promise<AnalysisResponse> {
     const prompt = description
       ? `${this.imageAnalysisPrompt} Use this provided description as helper: "${description}".`
       : this.imageAnalysisPrompt;

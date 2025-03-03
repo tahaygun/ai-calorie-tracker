@@ -9,11 +9,7 @@ type ExtendedNutritionData = NutritionData & {
 
 interface NutritionEditorProps {
   items: FoodItemNutrition[];
-  onUpdateItem: (
-    itemIndex: number,
-    field: keyof NutritionData,
-    value: number
-  ) => void;
+  onUpdateItem: (itemIndex: number, field: keyof NutritionData, value: number) => void;
   onUpdateItemName: (itemIndex: number, newName: string) => void;
   onRemoveItem: (itemIndex: number) => void;
   onConfirm: () => void;
@@ -46,7 +42,7 @@ export default function NutritionEditor({
 
   // Initialize the per-gram nutrition values
   useEffect(() => {
-    initialNutritionPerGram.current = items.map((item) => {
+    initialNutritionPerGram.current = items.map(item => {
       const nutrition = item.nutrition as ExtendedNutritionData;
       if (!nutrition.grams || nutrition.grams === 0) {
         return null;
@@ -67,11 +63,7 @@ export default function NutritionEditor({
   }, [items]);
 
   // Handle input change without immediate update
-  const handleInputChange = (
-    itemIndex: number,
-    field: string,
-    value: string
-  ) => {
+  const handleInputChange = (itemIndex: number, field: string, value: string) => {
     setActiveChange({ itemIndex, field, value });
   };
 
@@ -103,19 +95,12 @@ export default function NutritionEditor({
       const perGramValues = initialNutritionPerGram.current[itemIndex];
       if (perGramValues) {
         // Update all nutrition values based on grams
-        Object.keys(perGramValues).forEach((nutrientKey) => {
+        Object.keys(perGramValues).forEach(nutrientKey => {
           if (nutrientKey !== 'grams') {
             const scaledValue = parseFloat(
-              (
-                perGramValues[nutrientKey as keyof ExtendedNutritionData] *
-                numericValue
-              ).toFixed(2)
+              (perGramValues[nutrientKey as keyof ExtendedNutritionData] * numericValue).toFixed(2)
             );
-            onUpdateItem(
-              itemIndex,
-              nutrientKey as keyof NutritionData,
-              scaledValue
-            );
+            onUpdateItem(itemIndex, nutrientKey as keyof NutritionData, scaledValue);
           }
         });
       }
@@ -129,58 +114,54 @@ export default function NutritionEditor({
   };
 
   return (
-    <div className='bg-gray-800 p-3 border border-gray-700 rounded'>
-      <h2 className='mb-2 font-semibold text-sm'>
-        Verify Nutrition Information
-      </h2>
-      <div className='space-y-3'>
+    <div className="bg-gray-800 p-3 border border-gray-700 rounded">
+      <h2 className="mb-2 font-semibold text-sm">Verify Nutrition Information</h2>
+      <div className="space-y-3">
         {items.map((item, itemIndex) => (
-          <div key={itemIndex} className='bg-gray-700 p-2.5 rounded'>
-            <div className='flex justify-between items-center mb-2'>
+          <div key={itemIndex} className="bg-gray-700 p-2.5 rounded">
+            <div className="flex justify-between items-center mb-2">
               {activeNameEdit && activeNameEdit.itemIndex === itemIndex ? (
                 <input
-                  type='text'
+                  type="text"
                   value={activeNameEdit.value}
-                  onChange={(e) => handleNameChange(itemIndex, e.target.value)}
+                  onChange={e => handleNameChange(itemIndex, e.target.value)}
                   onBlur={commitNameChange}
-                  onKeyDown={(e) => {
+                  onKeyDown={e => {
                     if (e.key === 'Enter') {
                       commitNameChange();
                     }
                   }}
-                  className='bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full font-medium text-gray-100 text-sm'
+                  className="bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full font-medium text-gray-100 text-sm"
                   autoFocus
                 />
               ) : (
-                <div className='flex items-center'>
-                  <p className='font-medium text-sm'>{item.item}</p>
+                <div className="flex items-center">
+                  <p className="font-medium text-sm">{item.item}</p>
                   <button
-                    onClick={() =>
-                      setActiveNameEdit({ itemIndex, value: item.item })
-                    }
-                    className='ml-2 p-0.5 text-gray-400 hover:text-white'
-                    title='Edit item name'
+                    onClick={() => setActiveNameEdit({ itemIndex, value: item.item })}
+                    className="ml-2 p-0.5 text-gray-400 hover:text-white"
+                    title="Edit item name"
                   >
-                    <FaPen className='w-3.5 h-3.5' />
+                    <FaPen className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
               <button
                 onClick={() => onRemoveItem(itemIndex)}
-                className='p-1 text-red-400 hover:text-red-300'
-                title='Remove item'
+                className="p-1 text-red-400 hover:text-red-300"
+                title="Remove item"
               >
-                <FaTrash className='w-4 h-4' />
+                <FaTrash className="w-4 h-4" />
               </button>
             </div>
-            <div className='gap-2 grid grid-cols-3 md:grid-cols-5'>
+            <div className="gap-2 grid grid-cols-3 md:grid-cols-5">
               {Object.entries(item.nutrition).map(([key, value]) => (
-                <div key={key} className='flex flex-col'>
-                  <label className='mb-0.5 text-gray-400 text-xs'>
+                <div key={key} className="flex flex-col">
+                  <label className="mb-0.5 text-gray-400 text-xs">
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </label>
                   <input
-                    type='number'
+                    type="number"
                     value={
                       activeChange &&
                       activeChange.itemIndex === itemIndex &&
@@ -188,18 +169,18 @@ export default function NutritionEditor({
                         ? activeChange.value
                         : value.toString()
                     }
-                    onChange={(e) => {
+                    onChange={e => {
                       handleInputChange(itemIndex, key, e.target.value);
                     }}
                     onBlur={() => {
                       commitChange();
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter') {
                         commitChange();
                       }
                     }}
-                    className='bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full text-gray-100 text-sm'
+                    className="bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full text-gray-100 text-sm"
                   />
                 </div>
               ))}
@@ -208,41 +189,38 @@ export default function NutritionEditor({
         ))}
       </div>
       {items.length > 1 ? (
-        <div className='mt-2.5 pt-2 border-gray-600 border-t'>
-          <div className='gap-2 grid grid-cols-3 md:grid-cols-5 text-xs'>
-            {Object.keys(items[0]?.nutrition || {}).map((key) => {
+        <div className="mt-2.5 pt-2 border-gray-600 border-t">
+          <div className="gap-2 grid grid-cols-3 md:grid-cols-5 text-xs">
+            {Object.keys(items[0]?.nutrition || {}).map(key => {
               const total = items.reduce(
-                (sum, item) =>
-                  sum + (item.nutrition[key as keyof NutritionData] || 0),
+                (sum, item) => sum + (item.nutrition[key as keyof NutritionData] || 0),
                 0
               );
               return (
                 <div
                   key={key}
-                  className='flex flex-col items-center bg-gray-900 px-2 py-1.5 rounded'
+                  className="flex flex-col items-center bg-gray-900 px-2 py-1.5 rounded"
                 >
-                  <span className='text-gray-400'>
+                  <span className="text-gray-400">
                     Total {key.charAt(0).toUpperCase() + key.slice(1)}
                   </span>
-                  <span className='font-bold text-green-400 text-sm'>
-                    {total.toFixed(1)}
-                  </span>
+                  <span className="font-bold text-green-400 text-sm">{total.toFixed(1)}</span>
                 </div>
               );
             })}
           </div>
         </div>
       ) : null}
-      <div className='flex gap-2 mt-3'>
+      <div className="flex gap-2 mt-3">
         <button
           onClick={onConfirm}
-          className='bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded font-medium text-sm transition-colors'
+          className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded font-medium text-sm transition-colors"
         >
           Confirm & Save
         </button>
         <button
           onClick={onCancel}
-          className='bg-gray-600 hover:bg-gray-700 px-3 py-1.5 rounded text-sm transition-colors'
+          className="bg-gray-600 hover:bg-gray-700 px-3 py-1.5 rounded text-sm transition-colors"
         >
           Cancel
         </button>

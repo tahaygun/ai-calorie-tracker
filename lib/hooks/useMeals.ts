@@ -76,19 +76,15 @@ export function useMeals() {
   };
 
   const addMeal = (meal: MealEntry) => {
-    setDailyMeals((prev) => [...prev, meal]);
+    setDailyMeals(prev => [...prev, meal]);
   };
 
   const deleteMeal = (id: string) => {
-    setDailyMeals((prev) => prev.filter((meal) => meal.id !== id));
+    setDailyMeals(prev => prev.filter(meal => meal.id !== id));
   };
 
-  const updateItemNutrition = (
-    itemIndex: number,
-    field: keyof NutritionData,
-    value: number
-  ) => {
-    setEditableItems((items) =>
+  const updateItemNutrition = (itemIndex: number, field: keyof NutritionData, value: number) => {
+    setEditableItems(items =>
       items.map((item, index) =>
         index === itemIndex
           ? {
@@ -104,7 +100,7 @@ export function useMeals() {
   };
 
   const updateItemName = (itemIndex: number, newName: string) => {
-    setEditableItems((items) =>
+    setEditableItems(items =>
       items.map((item, index) =>
         index === itemIndex
           ? {
@@ -117,9 +113,7 @@ export function useMeals() {
   };
 
   const removeItem = (itemIndex: number) => {
-    setEditableItems((items) =>
-      items.filter((_, index) => index !== itemIndex)
-    );
+    setEditableItems(items => items.filter((_, index) => index !== itemIndex));
   };
 
   return {

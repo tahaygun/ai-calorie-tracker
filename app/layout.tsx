@@ -41,7 +41,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Free AI Calorie Tracker - No Account Needed',
-    description: 'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
+    description:
+      'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
     url: 'https://ai-calorietracker.vercel.app',
     siteName: 'AI Calorie Tracker',
     images: [
@@ -56,7 +57,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Free AI Calorie Tracker - No Account Needed',
-    description: 'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
+    description:
+      'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
     images: ['/icons/icon-512x512.png'],
   },
   appleWebApp: {
@@ -73,7 +75,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body className={inter.className}>
         <Analytics />
         <SettingsProvider>

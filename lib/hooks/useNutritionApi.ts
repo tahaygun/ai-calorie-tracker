@@ -34,8 +34,7 @@ export function useNutritionApi() {
         headers: {
           'Content-Type': 'application/json',
           'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model':
-            selectedModel === 'custom' ? customModelName : selectedModel,
+          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
           'X-Text-Analysis-Prompt': textAnalysisPrompt,
         },
@@ -76,8 +75,7 @@ export function useNutritionApi() {
         method: 'POST',
         headers: {
           'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model':
-            selectedModel === 'custom' ? customModelName : selectedModel,
+          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
           'X-Image-Analysis-Prompt': imageAnalysisPrompt,
         },
