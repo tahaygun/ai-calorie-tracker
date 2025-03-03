@@ -26,6 +26,7 @@ export default function MealList({ meals, onToggleFavorite, onDelete, isFavorite
             id={meal.id}
             description={meal.description}
             items={meal.items}
+            timestamp={meal.timestamp}
             isFavorite={isFavorite(meal.id)}
             onToggleFavorite={() => onToggleFavorite(meal)}
             onDelete={() => onDelete(meal.id)}

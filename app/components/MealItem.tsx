@@ -7,6 +7,7 @@ interface MealItemProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onDelete: () => void;
+  timestamp?: string;
 }
 
 export default function MealItem({
@@ -15,11 +16,19 @@ export default function MealItem({
   isFavorite,
   onToggleFavorite,
   onDelete,
+  timestamp,
 }: MealItemProps) {
+  const formattedTime = timestamp
+    ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : null;
+
   return (
-    <div className="border-gray-700 bg-gray-800 p-3 border rounded">
+    <div className="bg-gray-800 p-3 border border-gray-700 rounded">
       <div className="flex justify-between items-start gap-3 mb-2">
-        <p className="text-sm">{description}</p>
+        <div>
+          <p className="text-sm">{description}</p>
+          {formattedTime && <p className="mt-1 text-gray-400 text-xs">Added at {formattedTime}</p>}
+        </div>
         <div className="flex gap-2 shrink-0">
           <button
             onClick={onToggleFavorite}
@@ -29,7 +38,7 @@ export default function MealItem({
           >
             ★
           </button>
-          <button onClick={onDelete} className="text-red-400 text-sm hover:text-red-300">
+          <button onClick={onDelete} className="text-red-400 hover:text-red-300 text-sm">
             Delete
           </button>
         </div>
