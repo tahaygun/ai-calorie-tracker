@@ -11,7 +11,14 @@ interface TokenUsage {
 }
 
 export function useNutritionApi() {
-  const { apiKey, selectedModel, customModelName, debugMode } = useSettings();
+  const {
+    apiKey,
+    selectedModel,
+    customModelName,
+    debugMode,
+    textAnalysisPrompt,
+    imageAnalysisPrompt,
+  } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
 
@@ -30,6 +37,7 @@ export function useNutritionApi() {
           'X-OpenAI-Model':
             selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
+          'X-Text-Analysis-Prompt': textAnalysisPrompt,
         },
         body: JSON.stringify({ description }),
       });
@@ -38,7 +46,11 @@ export function useNutritionApi() {
 
       if (response.ok && data.nutritionData) {
         if (data.debugInfo) {
-          setTokenUsage(data.debugInfo);
+          setTokenUsage({
+            totalTokens: data.debugInfo.totalTokens,
+            promptTokens: data.debugInfo.promptTokens,
+            completionTokens: data.debugInfo.completionTokens,
+          });
         }
         return data.nutritionData as FoodItemNutrition[];
       } else {
@@ -58,7 +70,7 @@ export function useNutritionApi() {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      formData.append('description', description || 'Food image analysis');
+      if (description) formData.append('description', description);
 
       const response = await fetch('/api/meals/image', {
         method: 'POST',
@@ -67,6 +79,7 @@ export function useNutritionApi() {
           'X-OpenAI-Model':
             selectedModel === 'custom' ? customModelName : selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
+          'X-Image-Analysis-Prompt': imageAnalysisPrompt,
         },
         body: formData,
       });
@@ -75,7 +88,11 @@ export function useNutritionApi() {
 
       if (response.ok && data.nutritionData) {
         if (data.debugInfo) {
-          setTokenUsage(data.debugInfo);
+          setTokenUsage({
+            totalTokens: data.debugInfo.totalTokens,
+            promptTokens: data.debugInfo.promptTokens,
+            completionTokens: data.debugInfo.completionTokens,
+          });
         }
         return data.nutritionData as FoodItemNutrition[];
       } else {

@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const apiKey = request.headers.get('X-OpenAI-Key');
     const model = request.headers.get('X-OpenAI-Model') || 'gpt-4o-mini';
     const debug = request.headers.get('X-Debug-Mode') === 'true';
+    const imageAnalysisPrompt = request.headers.get('X-Image-Analysis-Prompt');
 
     if (!apiKey) {
       return NextResponse.json(
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
       apiKey,
       model,
       debug,
+      imageAnalysisPrompt: imageAnalysisPrompt || undefined,
     });
 
     const result = await openAIService.analyzeImageData(

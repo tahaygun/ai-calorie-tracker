@@ -1,4 +1,9 @@
 import OpenAI from 'openai';
+import {
+  DEFAULT_IMAGE_PROMPT,
+  DEFAULT_TEXT_PROMPT,
+  EXAMPLE_RESPONSE,
+} from './constants/prompts';
 
 export interface NutritionData {
   calories: number;
@@ -17,6 +22,8 @@ export interface OpenAIServiceConfig {
   apiKey: string;
   model: string;
   debug?: boolean;
+  textAnalysisPrompt?: string;
+  imageAnalysisPrompt?: string;
 }
 
 export interface AnalysisResponse {
@@ -40,21 +47,26 @@ export interface AnalysisResponse {
     };
   };
 }
-const exampleResponse = ` Example response: {"meal":[{"item":"vanillestange","nutrition":{"calories":2,"protein":4,"carbs":40,"fat":10,"fiber":2,"grams"50}},{"item":"yumurta","nutrition":{"calories":70,"protein":6,"carbs":1,"fat":5,"fiber":0,"grams"75}}]}.`;
+
 export class OpenAIService {
   private client: OpenAI;
   private model: string;
   private debug: boolean;
+  private textAnalysisPrompt: string;
+  private imageAnalysisPrompt: string;
 
   constructor(config: OpenAIServiceConfig) {
     this.client = new OpenAI({ apiKey: config.apiKey });
     this.model = config.model;
     this.debug = config.debug || false;
+    this.textAnalysisPrompt = config.textAnalysisPrompt || DEFAULT_TEXT_PROMPT;
+    this.imageAnalysisPrompt =
+      config.imageAnalysisPrompt || DEFAULT_IMAGE_PROMPT;
   }
 
   async analyzeFoodData(description: string): Promise<AnalysisResponse> {
-    const prompt = `Analyze the following meal description and provide nutritional information for each item. Combine them if you think they are the same item. If it is a meal, combine them and provide the nutritional information for the meal. Format the response as a JSON array where each object has "item" and "nutrition" properties. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Estimate the grams of each item if it is not mentioned. Be precise and realistic with the values. If the description is not clear, provide the best guess. 
-    ${exampleResponse}
+    const prompt = `${this.textAnalysisPrompt}
+    ${EXAMPLE_RESPONSE}
     
     Meal description: "${description}"`;
 
@@ -96,8 +108,8 @@ export class OpenAIService {
     description?: string
   ): Promise<AnalysisResponse> {
     const prompt = description
-      ? `Analyze this food image with this provided description together: "${description}". Provide nutritional information for each visible item on the image. Use the description as helper. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. If it is a meal, combine them and provide the nutritional information for the meal as one item, don't split into ingredients. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.`
-      : 'Analyze this food image and provide nutritional information for each visible item. Format the response as a JSON object with an "items" array where each object has "item" and "nutrition" properties. If it is a meal, combine them and provide the nutritional information for the meal as one item, don\'t split into ingredients. The "nutrition" object should have "calories", "protein", "carbs", "fat", "grams", and "fiber" (all in grams except calories). Be precise and realistic with the values. Estimate the grams of each item if it is not mentioned.';
+      ? `${this.imageAnalysisPrompt} Use this provided description as helper: "${description}".`
+      : this.imageAnalysisPrompt;
 
     const response = await this.client.chat.completions.create({
       model: this.model,
@@ -105,7 +117,7 @@ export class OpenAIService {
         {
           role: 'user',
           content: [
-            { type: 'text', text: prompt + exampleResponse },
+            { type: 'text', text: prompt + EXAMPLE_RESPONSE },
             {
               type: 'image_url',
               image_url: {

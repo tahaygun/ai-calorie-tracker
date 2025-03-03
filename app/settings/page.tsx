@@ -1,7 +1,10 @@
 'use client';
 
+import {
+  DEFAULT_IMAGE_PROMPT,
+  DEFAULT_TEXT_PROMPT,
+} from '@/lib/constants/prompts';
 import { useSettings } from '@/lib/contexts/SettingsContext';
-import Link from 'next/link';
 import { useState } from 'react';
 import DataPortability from '../components/DataPortability';
 
@@ -19,23 +22,20 @@ export default function SettingsPage() {
     setDebugMode,
     targetWeight,
     setTargetWeight,
+    textAnalysisPrompt,
+    setTextAnalysisPrompt,
+    imageAnalysisPrompt,
+    setImageAnalysisPrompt,
   } = useSettings();
 
   const [showApiKey, setShowApiKey] = useState(false);
 
   return (
-    <div className='mx-auto p-6 max-w-2xl'>
-      <div className='space-y-5 bg-gray-800 shadow-lg p-6 rounded-lg'>
-        <div className='flex justify-between items-center'>
-          <h1 className='font-semibold text-xl'>Settings</h1>
-          <Link
-            href='/'
-            className='bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm transition-colors'
-          >
-            Back to Tracker
-          </Link>
-        </div>
+    <div className='bg-gray-900 min-h-screen text-gray-100'>
+      <div className='space-y-6 mx-auto p-4 max-w-2xl'>
+        <h1 className='mb-6 font-bold text-2xl'>Settings</h1>
 
+        {/* API Key */}
         <div>
           <label htmlFor='apiKey' className='block mb-1 font-medium text-sm'>
             OpenAI API Key
@@ -58,37 +58,44 @@ export default function SettingsPage() {
               {showApiKey ? (
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
                   viewBox='0 0 24 24'
-                  fill='currentColor'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
                   className='w-5 h-5'
                 >
-                  <path d='M3.53 2.47a.75.75 0 00-1.06 1.06l18 18a.75.75 0 101.06-1.06l-18-18zM22.676 12.553a11.249 11.249 0 01-2.631 4.31l-3.099-3.099a5.25 5.25 0 00-6.71-6.71L7.759 4.577a11.217 11.217 0 014.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113z' />
-                  <path d='M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0115.75 12zM12.53 15.713l-4.243-4.244a3.75 3.75 0 004.243 4.243z' />
-                  <path d='M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 00-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 016.75 12z' />
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88'
+                  />
                 </svg>
               ) : (
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
                   viewBox='0 0 24 24'
-                  fill='currentColor'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
                   className='w-5 h-5'
                 >
-                  <path d='M12 15a3 3 0 100-6 3 3 0 000 6z' />
                   <path
-                    fillRule='evenodd'
-                    d='M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z'
-                    clipRule='evenodd'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z'
+                  />
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
                   />
                 </svg>
               )}
             </button>
           </div>
-          <p className='mt-1 text-gray-400 text-xs'>
-            Your API key is stored locally in your browser and never sent to our
-            servers.
-          </p>
         </div>
 
+        {/* Calorie Target */}
         <div>
           <label
             htmlFor='targetCalories'
@@ -106,6 +113,7 @@ export default function SettingsPage() {
           />
         </div>
 
+        {/* Target Weight */}
         <div>
           <label
             htmlFor='targetWeight'
@@ -124,6 +132,7 @@ export default function SettingsPage() {
           />
         </div>
 
+        {/* Model Selection */}
         <div>
           <label htmlFor='model' className='block mb-1 font-medium text-sm'>
             OpenAI Model
@@ -144,6 +153,7 @@ export default function SettingsPage() {
           </select>
         </div>
 
+        {/* Custom Model Name */}
         {selectedModel === 'custom' && (
           <div>
             <label
@@ -163,6 +173,64 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* Text Analysis Prompt */}
+        <div>
+          <div className='flex justify-between items-center mb-1'>
+            <label htmlFor='textAnalysisPrompt' className='font-medium text-sm'>
+              Text Analysis Prompt
+            </label>
+            <button
+              onClick={() => setTextAnalysisPrompt(DEFAULT_TEXT_PROMPT)}
+              className='bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300 text-xs transition-colors'
+              title='Reset to default prompt'
+            >
+              Reset
+            </button>
+          </div>
+          <textarea
+            id='textAnalysisPrompt'
+            value={textAnalysisPrompt}
+            onChange={(e) => setTextAnalysisPrompt(e.target.value)}
+            className='bg-gray-700 p-2 border border-gray-600 rounded w-full h-32 text-gray-100'
+            placeholder='Enter the prompt for analyzing text descriptions'
+          />
+          <p className='mt-1 text-gray-400 text-sm'>
+            This prompt is used when analyzing meal descriptions. Leave empty to
+            use the default prompt.
+          </p>
+        </div>
+
+        {/* Image Analysis Prompt */}
+        <div>
+          <div className='flex justify-between items-center mb-1'>
+            <label
+              htmlFor='imageAnalysisPrompt'
+              className='font-medium text-sm'
+            >
+              Image Analysis Prompt
+            </label>
+            <button
+              onClick={() => setImageAnalysisPrompt(DEFAULT_IMAGE_PROMPT)}
+              className='bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300 text-xs transition-colors'
+              title='Reset to default prompt'
+            >
+              Reset
+            </button>
+          </div>
+          <textarea
+            id='imageAnalysisPrompt'
+            value={imageAnalysisPrompt}
+            onChange={(e) => setImageAnalysisPrompt(e.target.value)}
+            className='bg-gray-700 p-2 border border-gray-600 rounded w-full h-32 text-gray-100'
+            placeholder='Enter the prompt for analyzing food images'
+          />
+          <p className='mt-1 text-gray-400 text-sm'>
+            This prompt is used when analyzing food images. Leave empty to use
+            the default prompt.
+          </p>
+        </div>
+
+        {/* Debug Mode */}
         <div className='flex items-center gap-2'>
           <input
             type='checkbox'
