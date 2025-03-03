@@ -48,6 +48,8 @@ export default function Home() {
     }
 
     try {
+      setEditableItems([]);
+      setIsEditing(false);
       const nutritionData = await analyzeMealDescription(mealDescription);
       setEditableItems(nutritionData);
       setIsEditing(true);
@@ -124,7 +126,7 @@ export default function Home() {
           </div>
         )}
 
-        {isEditing && editableItems.length > 0 ? (
+        {isEditing && editableItems.length > 0 && (
           <div className="mt-6">
             <NutritionEditor
               items={editableItems}
@@ -138,10 +140,6 @@ export default function Home() {
                 clearTokenUsage();
               }}
             />
-          </div>
-        ) : (
-          <div className="mt-6">
-            <p className="text-gray-400">No items to edit</p>
           </div>
         )}
 
