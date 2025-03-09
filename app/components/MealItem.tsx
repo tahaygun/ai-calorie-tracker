@@ -26,11 +26,19 @@ export default function MealItem({
     : null;
 
   // Calculate totals
-  const totalCalories = items.reduce((sum, item) => sum + item.nutrition.calories, 0);
-  const totalProtein = items.reduce((sum, item) => sum + item.nutrition.protein, 0);
-  const totalCarbs = items.reduce((sum, item) => sum + item.nutrition.carbs, 0);
-  const totalFat = items.reduce((sum, item) => sum + item.nutrition.fat, 0);
-  const totalFiber = items.reduce((sum, item) => sum + item.nutrition.fiber, 0);
+  const totalCalories = parseFloat(
+    items.reduce((sum, item) => sum + item.nutrition.calories, 0).toFixed(2)
+  );
+  const totalProtein = parseFloat(
+    items.reduce((sum, item) => sum + item.nutrition.protein, 0).toFixed(2)
+  );
+  const totalCarbs = parseFloat(
+    items.reduce((sum, item) => sum + item.nutrition.carbs, 0).toFixed(2)
+  );
+  const totalFat = parseFloat(items.reduce((sum, item) => sum + item.nutrition.fat, 0).toFixed(2));
+  const totalFiber = parseFloat(
+    items.reduce((sum, item) => sum + item.nutrition.fiber, 0).toFixed(2)
+  );
 
   return (
     <div className="bg-gray-800 border border-gray-700 rounded">
@@ -49,7 +57,7 @@ export default function MealItem({
               ({items.length} {items.length === 1 ? 'item' : 'items'})
             </span>
 
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <button
                 onClick={e => {
                   e.stopPropagation();
@@ -102,7 +110,7 @@ export default function MealItem({
 
       {/* Detailed items - only visible when expanded */}
       {isExpanded && (
-        <div className="p-3 pt-0 space-y-2">
+        <div className="space-y-2 p-3 pt-0">
           {items.map((item, index) => (
             <div key={index} className="bg-gray-700 p-2 rounded">
               <p className="mb-1 text-sm">{item.item}</p>

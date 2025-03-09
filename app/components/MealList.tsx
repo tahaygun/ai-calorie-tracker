@@ -3,9 +3,9 @@ import MealItem from './MealItem';
 
 interface MealListProps {
   meals: MealEntry[];
-  onToggleFavorite: (meal: MealEntry) => void;
-  onDelete: (id: string) => void;
-  isFavorite: (id: string) => boolean;
+  onToggleFavorite: (_meal: MealEntry) => void;
+  onDelete: (_id: string) => void;
+  isFavorite: (_id: string) => boolean;
 }
 
 export default function MealList({ meals, onToggleFavorite, onDelete, isFavorite }: MealListProps) {
