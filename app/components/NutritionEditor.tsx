@@ -23,7 +23,7 @@ interface NutritionEditorProps {
   onUpdateItem: (itemIndex: number, field: keyof NutritionData, value: number) => void;
   onUpdateItemName: (itemIndex: number, newName: string) => void;
   onRemoveItem: (itemIndex: number) => void;
-  onConfirm: () => void;
+  onConfirm: (adjustedItems: FoodItemNutrition[]) => void;
   onCancel: () => void;
 }
 
@@ -220,23 +220,35 @@ export default function NutritionEditor({
 
   // Handle confirmation - apply serving size to all items before confirming
   const handleConfirm = () => {
-    // Only apply scaling if serving size is not 1
-    if (servingSize !== 1) {
-      originalItems.forEach((originalItem, itemIndex) => {
-        // Skip if the item doesn't exist
-        if (itemIndex >= items.length) return;
-
-        // Apply the serving size multiplier to all nutrition values
-        (Object.keys(originalItem.nutrition) as Array<keyof NutritionData>).forEach(key => {
-          const originalValue = originalItem.nutrition[key];
-          const finalValue = parseFloat((originalValue * servingSize).toFixed(2));
-          onUpdateItem(itemIndex, key, finalValue);
-        });
-      });
+    // If serving size is 1, we can just pass the original items
+    if (servingSize === 1) {
+      onConfirm([...items]);
+      return;
     }
 
-    // Call the parent confirm handler
-    onConfirm();
+    // Create a deep copy of the items with adjusted values for serving size
+    const adjustedItems = items.map((item, itemIndex) => {
+      // Skip if original item doesn't exist
+      if (!originalItems[itemIndex]) return item;
+
+      // Copy the item and create new nutrition object with scaled values
+      const newItem = { ...item };
+      const scaledNutrition = { ...item.nutrition };
+
+      // Apply scaling to each nutrition field
+      (Object.keys(originalItems[itemIndex].nutrition) as Array<keyof NutritionData>).forEach(
+        key => {
+          const originalValue = originalItems[itemIndex].nutrition[key];
+          scaledNutrition[key] = parseFloat((originalValue * servingSize).toFixed(2));
+        }
+      );
+
+      newItem.nutrition = scaledNutrition;
+      return newItem;
+    });
+
+    // Call onConfirm with the adjusted items
+    onConfirm(adjustedItems);
   };
 
   // Render a nutrition input field with proper handlers
@@ -350,9 +362,9 @@ export default function NutritionEditor({
       ) : null}
 
       {/* Serving Size Adjustment Section */}
-      <div className="mt-4 pt-4 border-t border-gray-700">
+      <div className="mt-4 pt-4 border-gray-700 border-t">
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <span className="text-gray-300">Serving:</span>
             <div className="flex items-center gap-2">
               <input
@@ -391,14 +403,14 @@ export default function NutritionEditor({
             ))}
           </div>
 
-          <div className="text-xs text-gray-400 text-center">
+          <div className="text-gray-400 text-xs text-center">
             Adjust serving size to scale all nutrition values
           </div>
         </div>
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-2 mt-3 justify-center">
+      <div className="flex justify-center gap-2 mt-3">
         <button
           onClick={handleConfirm}
           className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded font-medium text-sm transition-colors"

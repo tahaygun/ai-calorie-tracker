@@ -3,6 +3,7 @@ import { useSettings } from '@/lib/contexts/SettingsContext';
 import { useFavorites } from '@/lib/hooks/useFavorites';
 import { useMeals } from '@/lib/hooks/useMeals';
 import { useNutritionApi } from '@/lib/hooks/useNutritionApi';
+import type { FoodItemNutrition } from '@/lib/openai';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { MealEntry } from '../lib/types';
@@ -77,19 +78,22 @@ export default function Home() {
     }
   };
 
-  const handleConfirmMeal = () => {
+  const handleConfirmMeal = (adjustedItems: FoodItemNutrition[]) => {
     // If meal description is empty, create one from the item names
     let finalDescription = mealDescription;
-    if (!finalDescription && editableItems.length > 0) {
-      finalDescription = editableItems.map(item => item.item).join(', ');
+    if (!finalDescription && adjustedItems.length > 0) {
+      finalDescription = adjustedItems.map(item => item.item).join(', ');
     }
 
+    // Create and add the meal
     addMeal({
       id: Date.now().toString(),
       description: finalDescription,
-      items: editableItems,
+      items: adjustedItems,
       timestamp: new Date().toISOString(),
     });
+
+    // Reset state
     setMealDescription('');
     setEditableItems([]);
     setIsEditing(false);
