@@ -5,10 +5,17 @@ interface MealListProps {
   meals: MealEntry[];
   onToggleFavorite: (_meal: MealEntry) => void;
   onDelete: (_id: string) => void;
+  onEdit?: (_meal: MealEntry) => void;
   isFavorite: (_id: string) => boolean;
 }
 
-export default function MealList({ meals, onToggleFavorite, onDelete, isFavorite }: MealListProps) {
+export default function MealList({
+  meals,
+  onToggleFavorite,
+  onDelete,
+  onEdit,
+  isFavorite,
+}: MealListProps) {
   if (meals.length === 0) return null;
 
   // Sort meals by timestamp in descending order (newest first)
@@ -30,6 +37,7 @@ export default function MealList({ meals, onToggleFavorite, onDelete, isFavorite
             isFavorite={isFavorite(meal.id)}
             onToggleFavorite={() => onToggleFavorite(meal)}
             onDelete={() => onDelete(meal.id)}
+            onEdit={onEdit ? () => onEdit(meal) : undefined}
           />
         ))}
       </div>

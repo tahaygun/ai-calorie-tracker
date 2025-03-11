@@ -26,6 +26,7 @@ export default function Home() {
     calculateDailyTotals,
     addMeal,
     deleteMeal,
+    updateMeal,
     updateItemNutrition,
     updateItemName,
     removeItem,
@@ -39,6 +40,7 @@ export default function Home() {
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [resetImageUpload, setResetImageUpload] = useState(0);
+  const [editingMealId, setEditingMealId] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,19 +87,36 @@ export default function Home() {
       finalDescription = adjustedItems.map(item => item.item).join(', ');
     }
 
-    // Create and add the meal
-    addMeal({
-      id: Date.now().toString(),
-      description: finalDescription,
-      items: adjustedItems,
-      timestamp: new Date().toISOString(),
-    });
+    // If we're editing an existing meal, update it
+    if (editingMealId) {
+      updateMeal(editingMealId, {
+        description: finalDescription,
+        items: adjustedItems,
+      });
+      setEditingMealId(null);
+    } else {
+      // Create and add a new meal
+      addMeal({
+        id: Date.now().toString(),
+        description: finalDescription,
+        items: adjustedItems,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     // Reset state
     setMealDescription('');
     setEditableItems([]);
     setIsEditing(false);
     clearTokenUsage();
+  };
+
+  const handleEditMeal = (meal: MealEntry) => {
+    setMealDescription(meal.description);
+    setEditableItems(meal.items);
+    setIsEditing(true);
+    setEditingMealId(meal.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSelectFavorite = (favorite: MealEntry) => {
@@ -132,6 +151,11 @@ export default function Home() {
 
         {isEditing && editableItems.length > 0 && (
           <div className="mt-6">
+            {editingMealId && (
+              <div className="bg-blue-900/30 mb-3 p-2 border border-blue-700/50 rounded text-blue-300 text-sm">
+                <p>Editing meal - make your changes and click &quot;Confirm&quot; to save</p>
+              </div>
+            )}
             <NutritionEditor
               items={editableItems}
               onUpdateItem={updateItemNutrition}
@@ -141,6 +165,7 @@ export default function Home() {
               onCancel={() => {
                 setIsEditing(false);
                 setEditableItems([]);
+                setEditingMealId(null);
                 clearTokenUsage();
               }}
             />
@@ -151,6 +176,7 @@ export default function Home() {
           meals={dailyMeals}
           onToggleFavorite={toggleFavorite}
           onDelete={deleteMeal}
+          onEdit={handleEditMeal}
           isFavorite={isMealFavorite}
         />
 

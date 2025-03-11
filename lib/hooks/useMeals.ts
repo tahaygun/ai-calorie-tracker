@@ -83,6 +83,10 @@ export function useMeals() {
     setDailyMeals(prev => prev.filter(meal => meal.id !== id));
   };
 
+  const updateMeal = (id: string, updatedMeal: Partial<MealEntry>) => {
+    setDailyMeals(prev => prev.map(meal => (meal.id === id ? { ...meal, ...updatedMeal } : meal)));
+  };
+
   const updateItemNutrition = (itemIndex: number, field: keyof NutritionData, value: number) => {
     setEditableItems(items =>
       items.map((item, index) =>
@@ -129,6 +133,7 @@ export function useMeals() {
     calculateDailyTotals,
     addMeal,
     deleteMeal,
+    updateMeal,
     updateItemNutrition,
     updateItemName,
     removeItem,

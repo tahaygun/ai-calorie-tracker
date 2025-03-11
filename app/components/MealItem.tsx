@@ -1,6 +1,13 @@
 import type { FoodItemNutrition } from '@/lib/openai';
 import { useState } from 'react';
-import { FaChevronDown, FaChevronRight, FaRegStar, FaStar, FaTrash } from 'react-icons/fa';
+import {
+  FaChevronDown,
+  FaChevronRight,
+  FaPencilAlt,
+  FaRegStar,
+  FaStar,
+  FaTrash,
+} from 'react-icons/fa';
 
 interface MealItemProps {
   id: string;
@@ -9,6 +16,7 @@ interface MealItemProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onDelete: () => void;
+  onEdit?: () => void;
   timestamp?: string;
 }
 
@@ -18,6 +26,7 @@ export default function MealItem({
   isFavorite,
   onToggleFavorite,
   onDelete,
+  onEdit,
   timestamp,
 }: MealItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -69,6 +78,17 @@ export default function MealItem({
               >
                 {isFavorite ? <FaStar size={16} /> : <FaRegStar size={16} />}
               </button>
+              {onEdit && (
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  className="text-blue-400 hover:text-blue-300"
+                >
+                  <FaPencilAlt size={14} />
+                </button>
+              )}
               <button
                 onClick={e => {
                   e.stopPropagation();
