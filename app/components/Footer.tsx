@@ -2,10 +2,13 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="w-full py-4 mt-1 text-center bg-gray-900">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="flex space-x-4">
+    <footer className="bg-gray-900 py-3 border-gray-800 border-t w-full text-xs">
+      <div className="mx-auto px-4 container">
+        <div className="flex md:flex-row flex-col md:justify-between items-center space-y-2 md:space-y-0">
+          <p className="text-gray-400 md:text-left text-center">
+            Free AI-powered calorie and nutrition tracking - No account needed
+          </p>
+          <div className="flex items-center space-x-3">
             <Link
               href="https://github.com/tahaygun"
               target="_blank"
@@ -14,7 +17,7 @@ export default function Footer() {
             >
               Made by @tahaygun
             </Link>
-            <span className="text-gray-500">•</span>
+            <span className="text-gray-600">•</span>
             <Link
               href="https://github.com/tahaygun/ai-calorie-tracker"
               target="_blank"
@@ -24,9 +27,6 @@ export default function Footer() {
               Open Source
             </Link>
           </div>
-          <p className="text-sm text-gray-400">
-            Free AI-powered calorie and nutrition tracking - No account needed
-          </p>
         </div>
       </div>
     </footer>
