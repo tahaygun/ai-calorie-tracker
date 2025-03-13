@@ -87,7 +87,7 @@ export class OpenAIService {
         request: {
           model: this.model,
           messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
+          temperature: 0.2,
           response_format: { type: 'json_object' },
         },
       };
@@ -118,7 +118,7 @@ export class OpenAIService {
         },
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.3,
+      temperature: 0.2,
     });
 
     const content = response.choices[0].message.content;
@@ -151,7 +151,7 @@ export class OpenAIService {
               ],
             },
           ],
-          temperature: 0.7,
+          temperature: 0.2,
           response_format: { type: 'json_object' },
           max_tokens: 1000,
         },
