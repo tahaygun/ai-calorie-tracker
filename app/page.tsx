@@ -69,7 +69,7 @@ export default function Home() {
     }
 
     try {
-      const nutritionData = await analyzeMealImage(imageFile);
+      const nutritionData = await analyzeMealImage(imageFile, mealDescription);
       setEditableItems(nutritionData);
       setIsEditing(true);
     } catch (error) {
