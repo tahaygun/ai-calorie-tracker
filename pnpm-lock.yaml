@@ -25,7 +25,7 @@ importers:
         version: 5.6.0(@babel/core@7.26.9)(next@15.2.2(@babel/core@7.26.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(webpack@5.98.0)
       openai:
         specifier: ^4.86.1
-        version: 4.86.1
+        version: 4.87.3
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -2371,8 +2371,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@4.86.1:
-    resolution: {integrity: sha512-x3iCLyaC3yegFVZaxOmrYJjitKxZ9hpVbLi+ZlT5UHuHTMlEQEbKXkGOM78z9qm2T5GF+XRUZCP2/aV4UPFPJQ==}
+  openai@4.87.3:
+    resolution: {integrity: sha512-d2D54fzMuBYTxMW8wcNmhT1rYKcTfMJ8t+4KjH2KtvYenygITiGBgHoIrzHwnDQWW+C5oCA+ikIR2jgPCFqcKQ==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -5649,7 +5649,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@4.86.1:
+  openai@4.87.3:
     dependencies:
       '@types/node': 18.19.80
       '@types/node-fetch': 2.6.12
