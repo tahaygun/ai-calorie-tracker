@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
-  "packageManager": "pnpm@10.9.0",
+  "packageManager": "pnpm@10.11.0",
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.8.1",
