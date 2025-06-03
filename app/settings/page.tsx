@@ -100,10 +100,9 @@ export default function SettingsPage() {
             onChange={e => setSelectedModel(e.target.value)}
             className="bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100"
           >
-            <option value="gpt-4o-mini">gpt-4o-mini (Mini, Recommended)</option>
+            <option value="gpt-4o-mini">gpt-4o-mini (Mini)</option>
             <option value="gpt-4o">gpt-4o (Standard)</option>
-            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster, cheaper)</option>
-            <option value="gpt-4">GPT-4</option>
+            <option value="gpt-4.1">GPT-4.1(Most Accurate)</option>
             <option value="custom">Custom Model</option>
           </select>
         </div>
