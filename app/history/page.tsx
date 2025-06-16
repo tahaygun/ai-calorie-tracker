@@ -2,7 +2,9 @@
 import type { FoodItemNutrition } from '@/lib/openai';
 import type { MealEntry } from '@/lib/types';
 import { useEffect, useState } from 'react';
+import AuthGuard from '../components/AuthGuard';
 import DayMealsModal from '../components/DayMealsModal';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 interface DailyTotal {
   date: string;
@@ -12,18 +14,22 @@ interface DailyTotal {
   fat: number;
 }
 
-export default function History() {
+function HistoryPage() {
+  const { user } = useAuth();
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedMeals, setSelectedMeals] = useState<MealEntry[]>([]);
 
   useEffect(() => {
-    // Get all localStorage keys
+    if (!user) return;
+
+    const userId = user.uid;
+    // Get all localStorage keys for this user
     const keys = Object.keys(localStorage);
-    const mealKeys = keys.filter(key => key.startsWith('meals_'));
+    const mealKeys = keys.filter(key => key.startsWith(`meals_${userId}_`));
 
     const totals = mealKeys.map(key => {
-      const date = key.replace('meals_', '');
+      const date = key.replace(`meals_${userId}_`, '');
       const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
 
       const dailyTotal = meals.reduce(
@@ -55,10 +61,13 @@ export default function History() {
     // Sort by date descending
     totals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     setDailyTotals(totals);
-  }, []);
+  }, [user]);
 
   const handleDayClick = (date: string) => {
-    const meals = JSON.parse(localStorage.getItem(`meals_${date}`) || '[]') as MealEntry[];
+    if (!user) return;
+    
+    const userId = user.uid;
+    const meals = JSON.parse(localStorage.getItem(`meals_${userId}_${date}`) || '[]') as MealEntry[];
     setSelectedDate(date);
     setSelectedMeals(meals);
   };
@@ -103,5 +112,13 @@ export default function History() {
         meals={selectedMeals}
       />
     </div>
+  );
+}
+
+export default function History() {
+  return (
+    <AuthGuard>
+      <HistoryPage />
+    </AuthGuard>
   );
 }

@@ -1,8 +1,10 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import type { MealEntry, NutritionTotals } from '../types';
 
 export function useMeals() {
+  const { user } = useAuth();
   const initialDateRef = useRef(new Date().toISOString().split('T')[0]);
   const [currentDate, setCurrentDate] = useState('');
   const [mealDescription, setMealDescription] = useState('');
@@ -16,23 +18,25 @@ export function useMeals() {
     setCurrentDate(initialDateRef.current);
   }, []);
 
-  // Load meals from localStorage when currentDate is set
+  // Load meals from localStorage when currentDate is set and user is available
   useEffect(() => {
-    if (!currentDate) return;
+    if (!currentDate || !user) return;
 
-    const storedMeals = localStorage.getItem(`meals_${currentDate}`);
+    const userId = user.uid;
+    const storedMeals = localStorage.getItem(`meals_${userId}_${currentDate}`);
     if (storedMeals) {
       setDailyMeals(JSON.parse(storedMeals));
     } else {
       setDailyMeals([]);
     }
-  }, [currentDate]);
+  }, [currentDate, user]);
 
   // Save meals whenever they change
   useEffect(() => {
-    if (!currentDate) return;
-    localStorage.setItem(`meals_${currentDate}`, JSON.stringify(dailyMeals));
-  }, [dailyMeals, currentDate]);
+    if (!currentDate || !user) return;
+    const userId = user.uid;
+    localStorage.setItem(`meals_${userId}_${currentDate}`, JSON.stringify(dailyMeals));
+  }, [dailyMeals, currentDate, user]);
 
   // Check for date changes
   useEffect(() => {

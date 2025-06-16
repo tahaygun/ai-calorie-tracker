@@ -13,11 +13,14 @@ export default function AboutPage() {
           </p>
           <ol className="space-y-2 pl-6 list-decimal">
             <li>
-              You enter a description of your meal (e.g., "2 scrambled eggs with toast and butter")
+              Create your account and sign in securely using email/password or Google authentication
+            </li>
+            <li>
+              Enter a description of your meal (e.g., "2 scrambled eggs with toast and butter")
               or upload a photo of your food
             </li>
             <li>
-              The app sends this description or image to OpenAI's API using your provided API key
+              The app sends this description or image to our secure AI analysis service
             </li>
             <li>The AI model analyzes the food items and estimates their nutritional content</li>
             <li>
@@ -31,24 +34,18 @@ export default function AboutPage() {
       <section className="mb-8">
         <h2 className="mb-4 font-semibold text-2xl">AI Model Selection</h2>
         <div className="space-y-4">
-          <p>You can choose between different OpenAI models for analysis:</p>
+          <p>You can choose between different AI models for analysis:</p>
           <ul className="space-y-2 pl-6 list-disc">
             <li>
-              <strong>GPT-4o-mini</strong> - Recommended for most users - good balance of speed,
-              cost and accuracy
+              <strong>GPT-4o-mini</strong> - Recommended for most users - good balance of speed
+              and accuracy
             </li>
             <li>
               <strong>GPT-4o</strong> - Latest model with excellent nutritional analysis
               capabilities
             </li>
             <li>
-              <strong>GPT-3.5 Turbo</strong> - Faster and less expensive option
-            </li>
-            <li>
-              <strong>GPT-4</strong> - Original high-accuracy model
-            </li>
-            <li>
-              <strong>Custom Model</strong> - Use your own fine-tuned model or other OpenAI models
+              <strong>GPT-4.1</strong> - Most accurate model for detailed analysis
             </li>
           </ul>
           <p className="text-gray-400 text-sm">
@@ -79,7 +76,7 @@ export default function AboutPage() {
       <section className="mb-8">
         <h2 className="mb-4 font-semibold text-2xl">Image Analysis</h2>
         <div className="space-y-4">
-          <p>The app now supports analyzing food images:</p>
+          <p>The app supports analyzing food images:</p>
           <ul className="space-y-2 pl-6 list-disc">
             <li>Upload photos of your meals for AI analysis</li>
             <li>Images are automatically compressed for faster processing</li>
@@ -99,7 +96,7 @@ export default function AboutPage() {
             <li>Set target weight goals that display on your progress chart</li>
             <li>Enter weights for current or past dates</li>
             <li>Manage your weight history with edit and delete options</li>
-            <li>All weight data is stored locally with your nutrition data</li>
+            <li>All weight data is stored securely with your account</li>
           </ul>
           <p className="text-gray-400 text-sm">
             Tip: Consistent tracking at the same time of day (typically morning, after waking up)
@@ -109,15 +106,16 @@ export default function AboutPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="mb-4 font-semibold text-2xl">Privacy & Data Storage</h2>
+        <h2 className="mb-4 font-semibold text-2xl">Privacy & Security</h2>
         <div className="space-y-4">
-          <p>Your privacy is important to us:</p>
+          <p>Your privacy and security are our top priorities:</p>
           <ul className="space-y-2 pl-6 list-disc">
-            <li>All data is stored locally in your browser</li>
-            <li>Your OpenAI API key is never sent to our servers</li>
-            <li>Meal data and images are only sent directly to OpenAI for analysis</li>
-            <li>No account or personal information is required</li>
+            <li>Secure authentication with Firebase (Google's trusted platform)</li>
+            <li>All data is associated with your secure user account</li>
+            <li>Meal data and images are processed securely through our AI service</li>
+            <li>No third parties have access to your personal nutrition data</li>
             <li>You can export your data for backup or transfer between devices</li>
+            <li>Account deletion removes all associated data permanently</li>
           </ul>
         </div>
       </section>
@@ -128,8 +126,8 @@ export default function AboutPage() {
           <p>Easily manage your nutrition data:</p>
           <ul className="space-y-2 pl-6 list-disc">
             <li>Export all your meal data, favorites, and settings</li>
-            <li>Import data on new devices or after clearing browser data</li>
-            <li>All transfers happen locally with no server involvement</li>
+            <li>Import data on new devices or after account changes</li>
+            <li>All transfers happen securely with your authenticated account</li>
           </ul>
         </div>
       </section>

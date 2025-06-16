@@ -1,20 +1,20 @@
 'use client';
-import { useSettings } from '@/lib/contexts/SettingsContext';
 import { useFavorites } from '@/lib/hooks/useFavorites';
 import { useMeals } from '@/lib/hooks/useMeals';
 import { useNutritionApi } from '@/lib/hooks/useNutritionApi';
 import type { FoodItemNutrition } from '@/lib/openai';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { MealEntry } from '../lib/types';
+import AuthGuard from './components/AuthGuard';
 import CalorieProgress from './components/CalorieProgress';
 import FavoritesModal from './components/FavoritesModal';
 import MealForm from './components/MealForm';
 import MealList from './components/MealList';
 import NutritionEditor from './components/NutritionEditor';
 import SettingsPrompt from './components/SettingsPrompt';
+import { useSettings } from '@/lib/contexts/SettingsContext';
 
-export default function Home() {
+function HomePage() {
   const {
     mealDescription,
     setMealDescription,
@@ -32,7 +32,7 @@ export default function Home() {
     removeItem,
   } = useMeals();
 
-  const { apiKey, targetCalories } = useSettings();
+  const { targetCalories } = useSettings();
 
   const { favorites, toggleFavorite, deleteFavorite, isMealFavorite } = useFavorites();
   const { isLoading, tokenUsage, analyzeMealDescription, analyzeMealImage, clearTokenUsage } =
@@ -41,14 +41,9 @@ export default function Home() {
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [resetImageUpload, setResetImageUpload] = useState(0);
   const [editingMealId, setEditingMealId] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!apiKey) {
-      router.push('/settings');
-      return;
-    }
 
     try {
       setEditableItems([]);
@@ -58,23 +53,18 @@ export default function Home() {
       setIsEditing(true);
     } catch (error) {
       console.error('Error analyzing meal:', error);
-      alert('Error analyzing meal. Please check your API key and try again.');
+      alert('Error analyzing meal. Please try again.');
     }
   };
 
   const handleImageUpload = async (imageFile: File) => {
-    if (!apiKey) {
-      router.push('/settings');
-      return;
-    }
-
     try {
       const nutritionData = await analyzeMealImage(imageFile, mealDescription);
       setEditableItems(nutritionData);
       setIsEditing(true);
     } catch (error) {
       console.error('Error analyzing image:', error);
-      alert('Error analyzing image. Please check your API key and try again.');
+      alert('Error analyzing image. Please try again.');
       // Reset the file input
       setResetImageUpload(prev => prev + 1);
     }
@@ -129,7 +119,6 @@ export default function Home() {
   return (
     <div className="bg-gray-900 min-h-screen text-gray-100">
       <main className="mx-auto p-4 max-w-2xl">
-        {!apiKey && <SettingsPrompt type="apiKey" />}
         {!targetCalories && <SettingsPrompt type="calorieTarget" />}
 
         <MealForm
@@ -153,7 +142,7 @@ export default function Home() {
           <div className="mt-6">
             {editingMealId && (
               <div className="bg-blue-900/30 mb-3 p-2 border border-blue-700/50 rounded text-blue-300 text-sm">
-                <p>Editing meal - make your changes and click &quot;Confirm&quot; to save</p>
+                <p>Editing meal - make your changes and click "Confirm" to save</p>
               </div>
             )}
             <NutritionEditor
@@ -189,5 +178,13 @@ export default function Home() {
         />
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthGuard>
+      <HomePage />
+    </AuthGuard>
   );
 }
