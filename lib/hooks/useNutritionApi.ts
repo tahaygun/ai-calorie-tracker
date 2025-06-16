@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import type { FoodItemNutrition } from '../openai';
 
@@ -11,30 +12,30 @@ interface TokenUsage {
 }
 
 export function useNutritionApi() {
-  const {
-    apiKey,
-    selectedModel,
-    customModelName,
-    debugMode,
-    textAnalysisPrompt,
-    imageAnalysisPrompt,
-  } = useSettings();
+  const { user } = useAuth();
+  const { selectedModel, debugMode, textAnalysisPrompt, imageAnalysisPrompt } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
 
+  const getAuthToken = async () => {
+    if (!user) throw new Error('User not authenticated');
+    return await user.getIdToken();
+  };
+
   const analyzeMealDescription = async (description: string) => {
-    if (!apiKey) {
-      throw new Error('API key is required');
+    if (!user) {
+      throw new Error('Please sign in to analyze meals');
     }
 
     setIsLoading(true);
     try {
+      const token = await getAuthToken();
       const response = await fetch('/api/meals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
+          Authorization: `Bearer ${token}`,
+          'X-OpenAI-Model': selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
           'X-Text-Analysis-Prompt': textAnalysisPrompt,
         },
@@ -61,12 +62,13 @@ export function useNutritionApi() {
   };
 
   const analyzeMealImage = async (file: File, description?: string) => {
-    if (!apiKey) {
-      throw new Error('API key is required');
+    if (!user) {
+      throw new Error('Please sign in to analyze images');
     }
 
     setIsLoading(true);
     try {
+      const token = await getAuthToken();
       const formData = new FormData();
       formData.append('image', file);
       if (description) formData.append('description', description);
@@ -74,8 +76,8 @@ export function useNutritionApi() {
       const response = await fetch('/api/meals/image', {
         method: 'POST',
         headers: {
-          'X-OpenAI-Key': apiKey,
-          'X-OpenAI-Model': selectedModel === 'custom' ? customModelName : selectedModel,
+          Authorization: `Bearer ${token}`,
+          'X-OpenAI-Model': selectedModel,
           'X-Debug-Mode': debugMode ? 'true' : 'false',
           'X-Image-Analysis-Prompt': imageAnalysisPrompt,
         },

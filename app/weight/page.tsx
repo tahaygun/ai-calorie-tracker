@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import AuthGuard from '../components/AuthGuard';
 
 // Dynamically import the WeightTracker component
 // This ensures Chart.js is only loaded when this page is visited
@@ -11,7 +12,7 @@ const DynamicWeightTracker = dynamic(() => import('../components/WeightTracker')
   ssr: false, // Disable server-side rendering for chart components
 });
 
-export default function WeightPage() {
+function WeightPage() {
   return (
     <div className="bg-gray-900 mx-auto px-4 py-6 max-w-4xl container">
       <div className="flex justify-between items-center mb-6">
@@ -28,5 +29,13 @@ export default function WeightPage() {
         <DynamicWeightTracker />
       </Suspense>
     </div>
+  );
+}
+
+export default function Weight() {
+  return (
+    <AuthGuard>
+      <WeightPage />
+    </AuthGuard>
   );
 }

@@ -1,16 +1,25 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import type { WeightEntry } from '../types';
 
 export function useWeights() {
+  const { user } = useAuth();
   const [weights, setWeights] = useState<WeightEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load weights from localStorage on component mount
   useEffect(() => {
+    if (!user) {
+      setWeights([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const storedWeights = localStorage.getItem('weight_entries');
+      const userId = user.uid;
+      const storedWeights = localStorage.getItem(`weight_entries_${userId}`);
       setWeights(storedWeights ? JSON.parse(storedWeights) : []);
     } catch (error) {
       console.error('Error loading weight entries:', error);
@@ -18,27 +27,31 @@ export function useWeights() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Save weights to localStorage whenever they change
   useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem('weight_entries', JSON.stringify(weights));
+    if (!isLoading && user) {
+      const userId = user.uid;
+      localStorage.setItem(`weight_entries_${userId}`, JSON.stringify(weights));
     }
-  }, [weights, isLoading]);
+  }, [weights, isLoading, user]);
 
   // Add a new weight entry
-  const addWeight = useCallback((weight: number, note?: string, date?: string) => {
-    const newEntry: WeightEntry = {
-      id: Date.now().toString(),
-      weight,
-      date: date || new Date().toISOString(),
-      note,
-    };
+  const addWeight = useCallback(
+    (weight: number, note?: string, date?: string) => {
+      const newEntry: WeightEntry = {
+        id: Date.now().toString(),
+        weight,
+        date: date || new Date().toISOString(),
+        note,
+      };
 
-    setWeights(prev => [...prev, newEntry]);
-    return newEntry;
-  }, []);
+      setWeights(prev => [...prev, newEntry]);
+      return newEntry;
+    },
+    []
+  );
 
   // Update an existing weight entry
   const updateWeight = useCallback((id: string, updates: Partial<Omit<WeightEntry, 'id'>>) => {

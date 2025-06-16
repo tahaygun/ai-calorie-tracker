@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/lib/contexts/AuthContext';
 import { SettingsProvider } from '@/lib/contexts/SettingsContext';
 import { Analytics } from '@vercel/analytics/react';
 import type { Metadata, Viewport } from 'next';
@@ -18,31 +19,30 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://ai-calorietracker.vercel.app'),
   title: {
-    default: 'Free AI Calorie Tracker - No Account Needed',
-    template: '%s | Free AI Calorie Tracker',
+    default: 'AI Calorie Tracker - Smart Nutrition Tracking',
+    template: '%s | AI Calorie Tracker',
   },
   description:
-    'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition with advanced food analysis. No account or signup required.',
+    'AI-powered calorie tracker with smart food analysis. Track your daily calories and nutrition with advanced AI technology. Secure user accounts and personalized tracking.',
   manifest: '/manifest.json',
   keywords: [
     'calorie tracker',
-    'free calorie counter',
     'AI nutrition analysis',
     'food tracker',
     'diet tracker',
     'nutrition calculator',
     'meal planner',
-    'open source calorie tracker',
-    'no account calorie tracker',
     'AI food analysis',
+    'personalized nutrition',
+    'smart calorie counting',
   ],
   authors: [{ name: 'tahaygun', url: 'https://github.com/tahaygun' }],
   creator: 'tahaygun',
   openGraph: {
     type: 'website',
-    title: 'Free AI Calorie Tracker - No Account Needed',
+    title: 'AI Calorie Tracker - Smart Nutrition Tracking',
     description:
-      'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
+      'AI-powered calorie tracker with smart food analysis. Track your daily calories and nutrition with advanced AI technology.',
     url: 'https://ai-calorietracker.vercel.app',
     siteName: 'AI Calorie Tracker',
     images: [
@@ -56,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free AI Calorie Tracker - No Account Needed',
+    title: 'AI Calorie Tracker - Smart Nutrition Tracking',
     description:
-      'Free, open-source calorie tracker powered by AI. Track your daily calories and nutrition instantly.',
+      'AI-powered calorie tracker with smart food analysis. Track your daily calories and nutrition with advanced AI technology.',
     images: ['/icons/icon-512x512.png'],
   },
   appleWebApp: {
@@ -78,9 +78,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <Analytics />
-        <SettingsProvider>
-          <ClientLayout>{children}</ClientLayout>
-        </SettingsProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <ClientLayout>{children}</ClientLayout>
+          </SettingsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

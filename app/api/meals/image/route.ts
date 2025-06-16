@@ -1,16 +1,35 @@
+import { adminAuth } from '@/lib/firebase/admin';
 import { OpenAIService } from '@/lib/openai';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const apiKey = request.headers.get('X-OpenAI-Key');
+    // Get the authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+
+    // Verify the Firebase token
+    let decodedToken;
+    try {
+      decodedToken = await adminAuth.verifyIdToken(token);
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Get OpenAI API key from environment
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    }
+
     const model = request.headers.get('X-OpenAI-Model') || 'gpt-4o-mini';
     const debug = request.headers.get('X-Debug-Mode') === 'true';
     const imageAnalysisPrompt = request.headers.get('X-Image-Analysis-Prompt');
-
-    if (!apiKey) {
-      return NextResponse.json({ error: 'OpenAI API key is required' }, { status: 401 });
-    }
 
     const formData = await request.formData();
     const imageFile = formData.get('image') as File;
@@ -33,11 +52,12 @@ export async function POST(request: Request) {
     });
 
     const result = await openAIService.analyzeImageData(base64Image, description || undefined);
-    console.log(result, 'result');
+    
     return NextResponse.json({
       message: 'Image analyzed successfully',
       nutritionData: result.data,
       debugInfo: result.debugInfo,
+      userId: decodedToken.uid, // Include user ID for logging if needed
     });
   } catch (error) {
     console.error('Error processing image:', error);

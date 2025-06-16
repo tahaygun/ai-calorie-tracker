@@ -1,18 +1,24 @@
 import { exportUserData, importUserData, validateUserData } from '@/lib/exportImport';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import { useRef, useState } from 'react';
 
 export default function DataPortability() {
+  const { user } = useAuth();
   const [importStatus, setImportStatus] = useState<{
     success: boolean;
     message: string;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [includeApiKey, setIncludeApiKey] = useState(true);
 
   const handleExport = () => {
+    if (!user) {
+      alert('Please sign in to export data');
+      return;
+    }
+
     try {
       // Get all user data
-      const userData = exportUserData();
+      const userData = exportUserData(user.uid);
 
       // Convert to JSON and create blob
       const jsonData = JSON.stringify(userData, null, 2);
@@ -37,6 +43,11 @@ export default function DataPortability() {
   };
 
   const handleImportClick = () => {
+    if (!user) {
+      alert('Please sign in to import data');
+      return;
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -44,7 +55,7 @@ export default function DataPortability() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -57,7 +68,7 @@ export default function DataPortability() {
 
         if (validation.valid) {
           // Import the data
-          importUserData(data, { includeApiKey });
+          importUserData(data, user.uid);
           setImportStatus({
             success: true,
             message: 'Data imported successfully. Reload the page to see changes.',
@@ -85,6 +96,17 @@ export default function DataPortability() {
     reader.readAsText(file);
   };
 
+  if (!user) {
+    return (
+      <div className="bg-gray-700 p-4 rounded-lg">
+        <h2 className="mb-4 font-medium text-lg">Data Portability</h2>
+        <p className="text-gray-300 text-sm">
+          Please sign in to access data import and export features.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-700 p-4 rounded-lg">
       <h2 className="mb-4 font-medium text-lg">Data Portability</h2>
@@ -108,21 +130,6 @@ export default function DataPortability() {
           >
             Import Data
           </button>
-
-          <div className="mt-2">
-            <label className="flex items-center text-sm">
-              <input
-                type="checkbox"
-                checked={includeApiKey}
-                onChange={e => setIncludeApiKey(e.target.checked)}
-                className="mr-2"
-              />
-              Include API key in import
-            </label>
-            <p className="mt-1 text-gray-400 text-xs">
-              When unchecked, your current API key will be preserved.
-            </p>
-          </div>
 
           <input
             type="file"

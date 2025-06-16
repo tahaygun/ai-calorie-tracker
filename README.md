@@ -1,34 +1,34 @@
 # AI Calorie Tracker
 
-A free, open-source calorie tracking application powered by AI. Track your daily nutrition with advanced food analysis - no account needed!
+A secure, AI-powered calorie tracking application with user authentication. Track your daily nutrition with advanced food analysis using your personal account.
 
 ![AI Calorie Tracker](public/icons/icon-512x512.png)
 
 ## 🌟 Features
 
-- **AI-Powered Text Analysis**: Get instant nutritional information for any food or meal using OpenAI's advanced language models
+- **Secure User Authentication**: Sign up with email/password or Google authentication via Firebase
+- **AI-Powered Analysis**: Get instant nutritional information for any food or meal using advanced AI models
 - **Image Analysis**: Upload food photos for automatic analysis and nutritional breakdown
-- **Weight Tracking**: Monitor your weight progress with an interactive chart and set target weight goals
-- **Enhanced Model Selection**: Choose from GPT-4o-mini (recommended), GPT-4o, GPT-3.5 Turbo, GPT-4, or use your own custom model
-- **Customizable Analysis Prompts**: Tailor the text and image analysis prompts to improve results for your specific needs
+- **Weight Tracking**: Monitor your weight progress with interactive charts and target weight goals
+- **Personal Data**: All your data is securely stored with your user account
+- **Enhanced Model Selection**: Choose from GPT-4o-mini (recommended), GPT-4o, or GPT-4.1
+- **Customizable Analysis Prompts**: Tailor the text and image analysis prompts to improve results
 - **Chronological Meal Display**: View your meals in chronological order with newest entries at the top
-- **No Account Required**: Start tracking immediately - no sign-up, no hassle
 - **Daily Summaries**: View your daily calorie and nutrition totals
 - **Favorites System**: Save your frequently eaten meals for quick access
-- **Data Portability**: Export and import your nutrition data for backup or transfer between devices
-- **Debug Mode**: View token usage and detailed analysis information for technical users
+- **Data Portability**: Export and import your nutrition data for backup or transfer
+- **Debug Mode**: View detailed analysis information for technical users
 - **PWA Support**: Install as a mobile app on any device
-- **Offline Capable**: Continue using the app even without internet
 - **Dark Theme**: Easy on the eyes with a modern dark interface
-- **Local Storage**: All data stored locally on your device for privacy
-- **Detailed About Page**: Learn how the app works and get tips for best results
+- **Secure Cloud Storage**: All data associated with your authenticated account
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- An OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- Firebase project with Authentication enabled
+- OpenAI API key
 
 ### Installation
 
@@ -45,13 +45,27 @@ cd ai-calorie-tracker
 npm install
 ```
 
-3. Start the development server:
+3. Set up environment variables:
+
+Copy `.env.example` to `.env.local` and fill in your Firebase and OpenAI credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+4. Configure Firebase:
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   - Enable Authentication with Email/Password and Google providers
+   - Generate a service account key for Firebase Admin SDK
+   - Add your configuration to `.env.local`
+
+5. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Building for Production
 
@@ -62,35 +76,41 @@ npm start
 
 ## 🔧 Technologies Used
 
-- **Next.js 14**: React framework for production
+- **Next.js 15**: React framework for production
 - **TypeScript**: Type-safe code
 - **Tailwind CSS**: Utility-first CSS framework
-- **OpenAI API**: AI-powered food analysis with model selection
+- **Firebase**: Authentication and user management
+- **OpenAI API**: AI-powered food analysis (server-side)
 - **next-pwa**: Progressive Web App support
-- **Local Storage**: Client-side data persistence
+- **Local Storage**: Client-side data persistence (user-specific)
+
+## 🔐 Authentication & Security
+
+- **Firebase Authentication**: Secure user management with email/password and Google sign-in
+- **Server-side API**: OpenAI API key is stored securely on the server
+- **User-specific Data**: All data is isolated per user account
+- **Token Verification**: All API requests are authenticated with Firebase tokens
+- **Data Privacy**: No user data is shared between accounts
 
 ## 📱 PWA Features
 
 - Installable on mobile devices
-- Offline support
-- Push notifications (coming soon)
-- Background sync (coming soon)
+- Offline support for cached data
+- Secure authentication persistence
 
 ## 🤖 AI Models
 
 The app supports multiple OpenAI models:
 
-- **GPT-4o-mini**: Recommended for most users - good balance of speed, cost and accuracy
+- **GPT-4o-mini**: Recommended for most users - good balance of speed and accuracy
 - **GPT-4o**: Latest model with excellent nutritional analysis capabilities
-- **GPT-3.5 Turbo**: Faster and less expensive option
-- **GPT-4**: Original high-accuracy model
-- **Custom Models**: Use your own fine-tuned models or other OpenAI models
+- **GPT-4.1**: Most accurate model for detailed analysis
 
-You can change models in the Settings page, accessible from the main navigation.
+You can change models in the Settings page after signing in.
 
 ## 🧠 Custom Analysis Prompts
 
-The app now supports customizable analysis prompts:
+The app supports customizable analysis prompts:
 
 - **Text Analysis Prompt**: Customize how the AI interprets your text descriptions
 - **Image Analysis Prompt**: Tailor the AI's approach to analyzing food images
@@ -101,13 +121,14 @@ Customize these in the Settings page under "AI Customization".
 
 ## 📷 Image Analysis
 
-The app now supports food image analysis:
+The app supports food image analysis:
 
-1. Click the camera icon in the meal input form
-2. Upload a photo of your food
-3. The AI will analyze the image and identify food items
-4. Review and adjust the nutritional information as needed
-5. Add the meal to your daily log
+1. Sign in to your account
+2. Click the camera icon in the meal input form
+3. Upload a photo of your food
+4. The AI will analyze the image and identify food items
+5. Review and adjust the nutritional information as needed
+6. Add the meal to your daily log
 
 Tips for best image analysis results:
 
@@ -125,17 +146,17 @@ Track your weight progress with the built-in weight tracker:
 - **Detailed History**: View and manage all your weight entries
 - **Date Selection**: Record weights for specific dates
 - **Add Notes**: Include optional notes with each weight entry
-- **Data Integration**: Weight data is stored locally and exportable with your other app data
+- **Secure Storage**: Weight data is stored securely with your account
 
-Access the weight tracker from the navigation menu and start monitoring your progress alongside your nutrition intake.
+Access the weight tracker from the navigation menu after signing in.
 
 ## 💾 Data Portability
 
-The app now features data import and export capabilities:
+The app features secure data import and export capabilities:
 
 - **Export Data**: Back up all your meal data, favorites, and settings
-- **Import Data**: Restore your data on a new device or after clearing your browser
-- **Privacy-Focused**: All data transfers happen locally with no server involvement
+- **Import Data**: Restore your data on a new device or after account changes
+- **Account-based**: All data transfers are associated with your authenticated account
 
 Access these features from the Settings page under "Data Management".
 
@@ -145,7 +166,7 @@ For technical users or troubleshooting:
 
 - **Token Usage Tracking**: View prompt and completion tokens used for API calls
 - **Detailed Response Information**: See how the AI interpreted your food descriptions
-- **Performance Optimization**: Useful for minimizing API costs or identifying issues
+- **Performance Optimization**: Useful for understanding API usage
 
 Enable Debug Mode in the Settings page.
 
@@ -182,6 +203,7 @@ For more details, see the [LICENSE](LICENSE) file.
 
 - Created by [@tahaygun](https://github.com/tahaygun)
 - Powered by [OpenAI](https://openai.com/)
+- Authentication by [Firebase](https://firebase.google.com/)
 - Built with [Next.js](https://nextjs.org/)
 
 ## 🔗 Links
@@ -190,10 +212,6 @@ For more details, see the [LICENSE](LICENSE) file.
 - [GitHub Repository](https://github.com/tahaygun/ai-calorie-tracker)
 - [Report Bug](https://github.com/tahaygun/ai-calorie-tracker/issues)
 - [Request Feature](https://github.com/tahaygun/ai-calorie-tracker/issues)
-
-## 📸 Screenshots
-
-[Coming Soon]
 
 ---
 
