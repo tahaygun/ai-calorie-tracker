@@ -2,60 +2,54 @@ import { MealEntry, WeightEntry } from '@/lib/types';
 
 export interface UserData {
   settings: {
-    apiKey: string;
     targetCalories: number;
     selectedModel: string;
-    customModelName: string;
     debugMode: boolean;
     targetWeight: number;
-    textAnalysisPrompt?: string; // Added for prompt customization
-    imageAnalysisPrompt?: string; // Added for prompt customization
+    textAnalysisPrompt?: string;
+    imageAnalysisPrompt?: string;
   };
   favorites: MealEntry[];
   mealHistory: Record<string, MealEntry[]>;
   weightEntries: WeightEntry[];
-  [key: string]: unknown; // Add index signature
+  [key: string]: unknown;
 }
 
 /**
- * Exports all user data from localStorage
+ * Exports all user data from localStorage for a specific user
  */
-export function exportUserData(): UserData {
+export function exportUserData(userId: string): UserData {
   // Get all localStorage keys
   const keys = Object.keys(localStorage);
 
-  // Extract meal history (keys like 'meals_2023-01-01')
-  const mealKeys = keys.filter(key => key.startsWith('meals_'));
+  // Extract meal history (keys like 'meals_userId_2023-01-01')
+  const mealKeys = keys.filter(key => key.startsWith(`meals_${userId}_`));
   const mealHistory: Record<string, MealEntry[]> = {};
 
   mealKeys.forEach(key => {
-    const date = key.replace('meals_', '');
+    const date = key.replace(`meals_${userId}_`, '');
     const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
     mealHistory[date] = meals;
   });
 
   // Extract settings
-  const apiKey = localStorage.getItem('openai_api_key') || '';
-  const targetCalories = parseInt(localStorage.getItem('target_calories') || '0');
-  const selectedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
-  const customModelName = localStorage.getItem('custom_model') || '';
-  const debugMode = localStorage.getItem('debug_mode') === 'true';
-  const targetWeight = parseFloat(localStorage.getItem('target_weight') || '0');
-  const textAnalysisPrompt = localStorage.getItem('text_analysis_prompt') || undefined;
-  const imageAnalysisPrompt = localStorage.getItem('image_analysis_prompt') || undefined;
+  const targetCalories = parseInt(localStorage.getItem(`target_calories_${userId}`) || '0');
+  const selectedModel = localStorage.getItem(`selected_model_${userId}`) || 'gpt-4o-mini';
+  const debugMode = localStorage.getItem(`debug_mode_${userId}`) === 'true';
+  const targetWeight = parseFloat(localStorage.getItem(`target_weight_${userId}`) || '0');
+  const textAnalysisPrompt = localStorage.getItem(`text_analysis_prompt_${userId}`) || undefined;
+  const imageAnalysisPrompt = localStorage.getItem(`image_analysis_prompt_${userId}`) || undefined;
 
   // Extract favorites
-  const favorites = JSON.parse(localStorage.getItem('favorite_meals') || '[]') as MealEntry[];
+  const favorites = JSON.parse(localStorage.getItem(`favorite_meals_${userId}`) || '[]') as MealEntry[];
 
   // Extract weight entries
-  const weightEntries = JSON.parse(localStorage.getItem('weight_entries') || '[]') as WeightEntry[];
+  const weightEntries = JSON.parse(localStorage.getItem(`weight_entries_${userId}`) || '[]') as WeightEntry[];
 
   return {
     settings: {
-      apiKey,
       targetCalories,
       selectedModel,
-      customModelName,
       debugMode,
       targetWeight,
       textAnalysisPrompt,
@@ -68,44 +62,39 @@ export function exportUserData(): UserData {
 }
 
 /**
- * Imports user data into localStorage
+ * Imports user data into localStorage for a specific user
  */
-export function importUserData(userData: UserData, options = { includeApiKey: false }): void {
+export function importUserData(userData: UserData, userId: string): void {
   // Import settings
-  if (options.includeApiKey) {
-    localStorage.setItem('openai_api_key', userData.settings.apiKey);
-  }
+  localStorage.setItem(`target_calories_${userId}`, userData.settings.targetCalories.toString());
+  localStorage.setItem(`selected_model_${userId}`, userData.settings.selectedModel);
+  localStorage.setItem(`debug_mode_${userId}`, userData.settings.debugMode.toString());
 
-  localStorage.setItem('target_calories', userData.settings.targetCalories.toString());
-  localStorage.setItem('selected_model', userData.settings.selectedModel);
-  localStorage.setItem('custom_model', userData.settings.customModelName);
-  localStorage.setItem('debug_mode', userData.settings.debugMode.toString());
-
-  // Import target weight if present (handling backward compatibility)
+  // Import target weight if present
   if ('targetWeight' in userData.settings) {
-    localStorage.setItem('target_weight', userData.settings.targetWeight.toString());
+    localStorage.setItem(`target_weight_${userId}`, userData.settings.targetWeight.toString());
   }
 
   // Import prompt settings if available
   if (userData.settings.textAnalysisPrompt) {
-    localStorage.setItem('text_analysis_prompt', userData.settings.textAnalysisPrompt);
+    localStorage.setItem(`text_analysis_prompt_${userId}`, userData.settings.textAnalysisPrompt);
   }
 
   if (userData.settings.imageAnalysisPrompt) {
-    localStorage.setItem('image_analysis_prompt', userData.settings.imageAnalysisPrompt);
+    localStorage.setItem(`image_analysis_prompt_${userId}`, userData.settings.imageAnalysisPrompt);
   }
 
   // Import favorites
-  localStorage.setItem('favorite_meals', JSON.stringify(userData.favorites));
+  localStorage.setItem(`favorite_meals_${userId}`, JSON.stringify(userData.favorites));
 
   // Import meal history
   Object.entries(userData.mealHistory).forEach(([date, meals]) => {
-    localStorage.setItem(`meals_${date}`, JSON.stringify(meals));
+    localStorage.setItem(`meals_${userId}_${date}`, JSON.stringify(meals));
   });
 
-  // Import weight entries if present (handling backward compatibility)
+  // Import weight entries if present
   if ('weightEntries' in userData) {
-    localStorage.setItem('weight_entries', JSON.stringify(userData.weightEntries));
+    localStorage.setItem(`weight_entries_${userId}`, JSON.stringify(userData.weightEntries));
   }
 }
 
@@ -135,7 +124,6 @@ export function validateUserData(data: unknown): {
     if (
       typeof settings.targetCalories !== 'number' ||
       typeof settings.selectedModel !== 'string' ||
-      typeof settings.customModelName !== 'string' ||
       typeof settings.debugMode !== 'boolean'
     ) {
       return { valid: false, message: 'Invalid settings format' };
