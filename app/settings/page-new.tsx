@@ -2,7 +2,7 @@
 
 import { DEFAULT_IMAGE_PROMPT, DEFAULT_TEXT_PROMPT } from '@/lib/constants/prompts';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import DataPortability from '../components/DataPortability';
 
 export default function SettingsPage() {

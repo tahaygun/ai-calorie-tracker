@@ -1,33 +1,43 @@
 # AI Calorie Tracker
 
-A free, open-source calorie tracking application powered by AI. Track your daily nutrition with advanced food analysis - no account needed!
+A premium AI-powered calorie tracking application with advanced nutrition analysis. Professional meal tracking with secure cloud storage and flexible subscription plans.
 
 ![AI Calorie Tracker](public/icons/icon-512x512.png)
 
 ## 🌟 Features
 
-- **AI-Powered Text Analysis**: Get instant nutritional information for any food or meal using OpenAI's advanced language models
+- **AI-Powered Analysis**: Advanced nutritional analysis using OpenAI's latest models (GPT-4o, GPT-4o-mini)
 - **Image Analysis**: Upload food photos for automatic analysis and nutritional breakdown
-- **Weight Tracking**: Monitor your weight progress with an interactive chart and set target weight goals
-- **Enhanced Model Selection**: Choose from GPT-4o-mini (recommended), GPT-4o, GPT-3.5 Turbo, GPT-4, or use your own custom model
-- **Customizable Analysis Prompts**: Tailor the text and image analysis prompts to improve results for your specific needs
-- **Chronological Meal Display**: View your meals in chronological order with newest entries at the top
-- **No Account Required**: Start tracking immediately - no sign-up, no hassle
-- **Daily Summaries**: View your daily calorie and nutrition totals
-- **Favorites System**: Save your frequently eaten meals for quick access
-- **Data Portability**: Export and import your nutrition data for backup or transfer between devices
-- **Debug Mode**: View token usage and detailed analysis information for technical users
+- **Secure Cloud Storage**: Your data is safely stored and synchronized across devices
+- **User Authentication**: Secure Firebase authentication with email/password and Google sign-in
+- **Subscription Plans**: Flexible pricing with free tier (10 analyses/month) to unlimited pro plans
+- **Weight Tracking**: Monitor your weight progress with interactive charts
+- **Usage Dashboard**: Track your API usage and manage your subscription
+- **Favorites System**: Save frequently eaten meals for quick access
+- **Data Portability**: Export and import your nutrition data
+- **Custom AI Prompts**: Tailor analysis prompts for your specific dietary needs
 - **PWA Support**: Install as a mobile app on any device
-- **Offline Capable**: Continue using the app even without internet
-- **Dark Theme**: Easy on the eyes with a modern dark interface
-- **Local Storage**: All data stored locally on your device for privacy
-- **Detailed About Page**: Learn how the app works and get tips for best results
+- **Dark Theme**: Modern, professional interface
+- **Real-time Sync**: Data synchronized across all your devices
+- **Professional Features**: Priority support, advanced analytics, and early access to new features
+
+## 🏗️ Architecture
+
+- **Frontend**: Next.js 15 with TypeScript
+- **Authentication**: Firebase Auth
+- **Database**: Cloud Firestore
+- **Payments**: Stripe integration
+- **AI Service**: OpenAI API (server-side)
+- **Hosting**: Vercel (recommended)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
+- Firebase project
+- Stripe account
+- OpenAI API key
 - An OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
 ### Installation

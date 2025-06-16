@@ -8,8 +8,8 @@ export default function AboutPage() {
         <h2 className="mb-4 font-semibold text-2xl">How It Works</h2>
         <div className="space-y-4">
           <p>
-            AI Calorie Tracker uses advanced AI technology to analyze your meals and provide
-            detailed nutritional information. Here's how the process works:
+            AI Calorie Tracker is a premium nutrition tracking service that uses advanced AI technology 
+            to analyze your meals and provide detailed nutritional information. Here's how it works:
           </p>
           <ol className="space-y-2 pl-6 list-decimal">
             <li>
@@ -17,35 +17,57 @@ export default function AboutPage() {
               or upload a photo of your food
             </li>
             <li>
-              The app sends this description or image to OpenAI's API using your provided API key
+              The app securely sends this description or image to our AI analysis service
             </li>
             <li>The AI model analyzes the food items and estimates their nutritional content</li>
             <li>
               The results are displayed, showing calories, protein, carbs, fat, and other nutrients
             </li>
+            <li>Your data is securely stored in your personal account</li>
             <li>You can save the meal to your daily log or add it to favorites for future use</li>
           </ol>
         </div>
       </section>
 
       <section className="mb-8">
+        <h2 className="mb-4 font-semibold text-2xl">Subscription Plans</h2>
+        <div className="space-y-4">
+          <p>Choose the plan that fits your nutrition tracking needs:</p>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <h3 className="font-bold text-lg text-blue-400">Free</h3>
+              <p className="text-gray-300 text-sm">10 AI analyses per month</p>
+              <p className="text-2xl font-bold">$0/month</p>
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg border border-blue-500">
+              <h3 className="font-bold text-lg text-blue-400">Basic</h3>
+              <p className="text-gray-300 text-sm">500 AI analyses per month</p>
+              <p className="text-2xl font-bold">$9.99/month</p>
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <h3 className="font-bold text-lg text-blue-400">Pro</h3>
+              <p className="text-gray-300 text-sm">Unlimited AI analyses</p>
+              <p className="text-2xl font-bold">$19.99/month</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-8">
         <h2 className="mb-4 font-semibold text-2xl">AI Model Selection</h2>
         <div className="space-y-4">
-          <p>You can choose between different OpenAI models for analysis:</p>
+          <p>We use the latest OpenAI models optimized for nutritional analysis:</p>
           <ul className="space-y-2 pl-6 list-disc">
             <li>
-              <strong>GPT-4o-mini</strong> - Recommended for most users - good balance of speed,
+              <strong>GPT-4o-mini</strong> - Default model offering excellent balance of speed,
               cost and accuracy
             </li>
             <li>
-              <strong>GPT-4o</strong> - Latest model with excellent nutritional analysis
+              <strong>GPT-4o</strong> - Latest model with superior nutritional analysis
               capabilities
             </li>
             <li>
-              <strong>GPT-3.5 Turbo</strong> - Faster and less expensive option
-            </li>
-            <li>
-              <strong>GPT-4</strong> - Original high-accuracy model
+              <strong>GPT-4 Turbo</strong> - High-performance model for complex meal analysis
             </li>
             <li>
               <strong>Custom Model</strong> - Use your own fine-tuned model or other OpenAI models

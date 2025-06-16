@@ -1,8 +1,10 @@
+import { useAuth } from '@/lib/contexts/AuthContext';
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useRef, useState } from 'react';
 import type { MealEntry, NutritionTotals } from '../types';
 
 export function useMeals() {
+  const { user } = useAuth();
   const initialDateRef = useRef(new Date().toISOString().split('T')[0]);
   const [currentDate, setCurrentDate] = useState('');
   const [mealDescription, setMealDescription] = useState('');
@@ -16,23 +18,61 @@ export function useMeals() {
     setCurrentDate(initialDateRef.current);
   }, []);
 
-  // Load meals from localStorage when currentDate is set
+  // Load meals from API when currentDate is set
   useEffect(() => {
-    if (!currentDate) return;
+    if (!currentDate || !user) return;
 
-    const storedMeals = localStorage.getItem(`meals_${currentDate}`);
-    if (storedMeals) {
-      setDailyMeals(JSON.parse(storedMeals));
-    } else {
-      setDailyMeals([]);
-    }
-  }, [currentDate]);
+    const loadMeals = async () => {
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch(`/api/user/meals?date=${currentDate}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setDailyMeals(data.meals || []);
+        } else {
+          console.error('Failed to load meals');
+          setDailyMeals([]);
+        }
+      } catch (error) {
+        console.error('Error loading meals:', error);
+        setDailyMeals([]);
+      }
+    };
 
-  // Save meals whenever they change
+    loadMeals();
+  }, [currentDate, user]);
+
+  // Save meals to API whenever they change
   useEffect(() => {
-    if (!currentDate) return;
-    localStorage.setItem(`meals_${currentDate}`, JSON.stringify(dailyMeals));
-  }, [dailyMeals, currentDate]);
+    if (!currentDate || !user || dailyMeals.length === 0) return;
+
+    const saveMeals = async () => {
+      try {
+        const token = await user.getIdToken();
+        await fetch('/api/user/meals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            date: currentDate,
+            meals: dailyMeals,
+          }),
+        });
+      } catch (error) {
+        console.error('Error saving meals:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveMeals, 500); // Debounce saves
+    return () => clearTimeout(timeoutId);
+  }, [dailyMeals, currentDate, user]);
 
   // Check for date changes
   useEffect(() => {

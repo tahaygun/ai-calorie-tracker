@@ -1,31 +1,65 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import type { WeightEntry } from '../types';
 
 export function useWeights() {
+  const { user } = useAuth();
   const [weights, setWeights] = useState<WeightEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load weights from localStorage on component mount
+  // Load weights from API on component mount
   useEffect(() => {
-    try {
-      const storedWeights = localStorage.getItem('weight_entries');
-      setWeights(storedWeights ? JSON.parse(storedWeights) : []);
-    } catch (error) {
-      console.error('Error loading weight entries:', error);
-      setWeights([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    if (!user) return;
 
-  // Save weights to localStorage whenever they change
+    const loadWeights = async () => {
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch('/api/user/weights', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setWeights(data.weights || []);
+        }
+      } catch (error) {
+        console.error('Error loading weight entries:', error);
+        setWeights([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadWeights();
+  }, [user]);
+
+  // Save weights to API whenever they change
   useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem('weight_entries', JSON.stringify(weights));
+    if (!isLoading && user && weights.length >= 0) {
+      const saveWeights = async () => {
+        try {
+          const token = await user.getIdToken();
+          await fetch('/api/user/weights', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ weights }),
+          });
+        } catch (error) {
+          console.error('Error saving weight entries:', error);
+        }
+      };
+
+      const timeoutId = setTimeout(saveWeights, 500); // Debounce saves
+      return () => clearTimeout(timeoutId);
     }
-  }, [weights, isLoading]);
+  }, [weights, isLoading, user]);
 
   // Add a new weight entry
   const addWeight = useCallback((weight: number, note?: string, date?: string) => {
