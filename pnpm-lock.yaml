@@ -24,8 +24,8 @@ importers:
         specifier: ^5.6.0
         version: 5.6.0(@babel/core@7.28.4)(next@15.5.6(@babel/core@7.28.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(webpack@5.102.1)
       openai:
-        specifier: ^5.0.0
-        version: 5.23.2
+        specifier: ^6.0.0
+        version: 6.6.0
       react:
         specifier: ^19.0.0
         version: 19.2.0
@@ -2500,12 +2500,12 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@5.23.2:
-    resolution: {integrity: sha512-MQBzmTulj+MM5O8SKEk/gL8a7s5mktS9zUtAkU257WjvobGc9nKcBuVwjyEEcb9SI8a8Y2G/mzn3vm9n1Jlleg==}
+  openai@6.6.0:
+    resolution: {integrity: sha512-1yWk4cBsHF5Bq9TreHYOHY7pbqdlT74COnm8vPx7WKn36StS+Hyk8DdAitnLaw67a5Cudkz5EmlFQjSrNnrA2w==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
-      zod: ^3.23.8
+      zod: ^3.25 || ^4.0
     peerDependenciesMeta:
       ws:
         optional: true
@@ -5852,7 +5852,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@5.23.2: {}
+  openai@6.6.0: {}
 
   optionator@0.9.4:
     dependencies:
