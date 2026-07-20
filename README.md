@@ -80,10 +80,10 @@ npm start
 
 The app supports multiple OpenAI models:
 
-- **GPT-4o-mini**: Recommended for most users - good balance of speed, cost and accuracy
-- **GPT-4o**: Latest model with excellent nutritional analysis capabilities
-- **GPT-3.5 Turbo**: Faster and less expensive option
-- **GPT-4**: Original high-accuracy model
+- **GPT-5.6 Terra**: Recommended balance of nutritional-analysis quality and cost
+- **GPT-5.6 Luna**: Lower-cost option for frequent meal logging
+- **GPT-5.6 Sol**: Highest-quality option for difficult meal descriptions and images
+- **GPT-5.5 and GPT-5.4**: Previous-generation options for existing preferences
 - **Custom Models**: Use your own fine-tuned models or other OpenAI models
 
 You can change models in the Settings page, accessible from the main navigation.

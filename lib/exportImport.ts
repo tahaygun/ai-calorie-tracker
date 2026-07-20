@@ -37,7 +37,7 @@ export function exportUserData(): UserData {
   // Extract settings
   const apiKey = localStorage.getItem('openai_api_key') || '';
   const targetCalories = parseInt(localStorage.getItem('target_calories') || '0');
-  const selectedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
+  const selectedModel = localStorage.getItem('selected_model') || 'gpt-5.6-terra';
   const customModelName = localStorage.getItem('custom_model') || '';
   const debugMode = localStorage.getItem('debug_mode') === 'true';
   const targetWeight = parseFloat(localStorage.getItem('target_weight') || '0');

@@ -34,18 +34,19 @@ export default function AboutPage() {
           <p>You can choose between different OpenAI models for analysis:</p>
           <ul className="space-y-2 pl-6 list-disc">
             <li>
-              <strong>GPT-4o-mini</strong> - Recommended for most users - good balance of speed,
-              cost and accuracy
+              <strong>GPT-5.6 Terra</strong> - Recommended balance of nutritional-analysis quality
+              and cost
             </li>
             <li>
-              <strong>GPT-4o</strong> - Latest model with excellent nutritional analysis
-              capabilities
+              <strong>GPT-5.6 Luna</strong> - Lower-cost option for frequent meal logging
             </li>
             <li>
-              <strong>GPT-3.5 Turbo</strong> - Faster and less expensive option
+              <strong>GPT-5.6 Sol</strong> - Highest-quality option for difficult meal descriptions
+              and images
             </li>
             <li>
-              <strong>GPT-4</strong> - Original high-accuracy model
+              <strong>GPT-5.5 and GPT-5.4</strong> - Previous-generation options for existing
+              preferences
             </li>
             <li>
               <strong>Custom Model</strong> - Use your own fine-tuned model or other OpenAI models

@@ -35,7 +35,6 @@ export interface AnalysisResponse {
         role: 'user' | 'assistant' | 'system';
         content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
       }>;
-      temperature: number;
       response_format: { type: string };
       max_tokens?: number;
     };
@@ -66,7 +65,6 @@ export class OpenAIService {
     const response = await this.client.chat.completions.create({
       model: this.model,
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
       response_format: { type: 'json_object' },
     });
 
@@ -87,7 +85,6 @@ export class OpenAIService {
         request: {
           model: this.model,
           messages: [{ role: 'user', content: prompt }],
-          temperature: 0.2,
           response_format: { type: 'json_object' },
         },
       };
@@ -118,7 +115,6 @@ export class OpenAIService {
         },
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.2,
     });
 
     const content = response.choices[0].message.content;
@@ -151,7 +147,6 @@ export class OpenAIService {
               ],
             },
           ],
-          temperature: 0.2,
           response_format: { type: 'json_object' },
           max_tokens: 1000,
         },

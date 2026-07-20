@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const apiKey = request.headers.get('X-OpenAI-Key');
-    const model = request.headers.get('X-OpenAI-Model') || 'gpt-4o-mini';
+    const model = request.headers.get('X-OpenAI-Model') || 'gpt-5.6-terra';
     const debug = request.headers.get('X-Debug-Mode') === 'true';
     const textAnalysisPrompt = request.headers.get('X-Text-Analysis-Prompt');
 

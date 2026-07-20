@@ -26,7 +26,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [apiKey, setApiKey] = useState('');
   const [targetCalories, setTargetCalories] = useState(0);
-  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [selectedModel, setSelectedModel] = useState('gpt-5.6-terra');
   const [customModelName, setCustomModelName] = useState('');
   const [debugMode, setDebugMode] = useState(false);
   const [targetWeight, setTargetWeight] = useState(0);
@@ -41,7 +41,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedApiKey = localStorage.getItem('openai_api_key') || '';
     const storedCalories = localStorage.getItem('target_calories');
-    const storedModel = localStorage.getItem('selected_model') || 'gpt-4o-mini';
+    const storedModel = localStorage.getItem('selected_model') || 'gpt-5.6-terra';
     const storedCustomModel = localStorage.getItem('custom_model') || '';
     const storedDebugMode = localStorage.getItem('debug_mode') === 'true';
     const storedTargetWeight = localStorage.getItem('target_weight');
