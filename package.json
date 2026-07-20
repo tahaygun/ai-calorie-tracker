@@ -15,7 +15,7 @@
   },
   "packageManager": "pnpm@11.15.1",
   "dependencies": {
-    "@vercel/analytics": "^1.6.1",
+    "@vercel/analytics": "^2.0.0",
     "axios": "^1.18.1",
     "chart.js": "^4.5.1",
     "next": "15.5.20",
