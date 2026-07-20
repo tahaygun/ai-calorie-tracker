@@ -1,7 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "automerge": true
+  "extends": ["config:recommended"],
+  "dependencyDashboardApproval": false,
+  "automerge": true,
+  "platformAutomerge": true,
+  "rangeStrategy": "auto",
+  "ignorePaths": ["apps/mobile/**"],
+  "minimumReleaseAge": "3 days",
+  "packageRules": [
+    {
+      "groupName": "React and Next.js",
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom",
+        "@next/*",
+        "eslint-config-next",
+        "@types/react",
+        "@types/react-dom"
+      ]
+    }
+  ]
 }
