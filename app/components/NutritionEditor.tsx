@@ -1,6 +1,6 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useRef, useState } from 'react';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck } from 'react-icons/fa';
 import NutritionItemCard from './NutritionItemCard';
 import ServingSizeSelector from './ServingSizeSelector';
 
@@ -326,10 +326,10 @@ export default function NutritionEditor({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all flex items-center gap-1.5 active:scale-[0.98]"
+          className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all flex items-center gap-1.5 active:scale-[0.98] cursor-pointer"
         >
-          <FaTimes className="w-3.5 h-3.5" />
-          <span>Cancel</span>
+          <FaArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+          <span>Back to Form</span>
         </button>
         <button
           type="button"

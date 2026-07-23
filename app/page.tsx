@@ -10,6 +10,7 @@ import type { MealEntry } from '../lib/types';
 import CalorieProgress from './components/CalorieProgress';
 import FavoritesModal from './components/FavoritesModal';
 import MealForm from './components/MealForm';
+import MealLoadingIndicator from './components/MealLoadingIndicator';
 import MealList from './components/MealList';
 import NutritionEditor from './components/NutritionEditor';
 import SettingsPrompt from './components/SettingsPrompt';
@@ -109,6 +110,7 @@ export default function Home() {
     setEditableItems([]);
     setIsEditing(false);
     clearTokenUsage();
+    setResetImageUpload(prev => prev + 1);
   };
 
   const handleEditMeal = (meal: MealEntry) => {
@@ -126,31 +128,18 @@ export default function Home() {
     setIsFavoritesOpen(false);
   };
 
+  const showConfirmationView = isEditing && editableItems.length > 0;
+
   return (
     <div className="min-h-screen text-slate-100 pb-12">
       <main className="mx-auto p-4 sm:p-6 max-w-2xl space-y-6">
         {!apiKey && <SettingsPrompt type="apiKey" />}
         {!targetCalories && <SettingsPrompt type="calorieTarget" />}
 
-        <MealForm
-          mealDescription={mealDescription}
-          setMealDescription={setMealDescription}
-          onSubmit={handleSubmit}
-          onImageUpload={handleImageUpload}
-          isLoading={isLoading}
-          tokenUsage={tokenUsage || undefined}
-          onOpenFavorites={() => setIsFavoritesOpen(true)}
-          key={resetImageUpload}
-        />
-
-        {dailyMeals.length > 0 && targetCalories > 0 && (
-          <div className="my-6">
-            <CalorieProgress totals={calculateDailyTotals()} targetCalories={targetCalories} />
-          </div>
-        )}
-
-        {isEditing && editableItems.length > 0 && (
-          <div className="my-6 space-y-3">
+        {isLoading ? (
+          <MealLoadingIndicator />
+        ) : showConfirmationView ? (
+          <div className="space-y-3">
             {editingMealId && (
               <div className="bg-blue-500/10 p-3 border border-blue-500/30 rounded-xl text-blue-300 text-xs font-medium">
                 <p>✏️ Editing meal - make your changes and click &quot;Confirm & Save&quot;</p>
@@ -169,6 +158,25 @@ export default function Home() {
                 clearTokenUsage();
               }}
             />
+          </div>
+        ) : null}
+
+        <div className={isLoading || showConfirmationView ? 'hidden' : 'block'}>
+          <MealForm
+            mealDescription={mealDescription}
+            setMealDescription={setMealDescription}
+            onSubmit={handleSubmit}
+            onImageUpload={handleImageUpload}
+            isLoading={isLoading}
+            tokenUsage={tokenUsage || undefined}
+            onOpenFavorites={() => setIsFavoritesOpen(true)}
+            key={resetImageUpload}
+          />
+        </div>
+
+        {dailyMeals.length > 0 && targetCalories > 0 && (
+          <div className="my-6">
+            <CalorieProgress totals={calculateDailyTotals()} targetCalories={targetCalories} />
           </div>
         )}
 

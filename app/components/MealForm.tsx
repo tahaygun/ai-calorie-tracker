@@ -36,6 +36,14 @@ export default function MealForm({
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (selectedImage) {
+        URL.revokeObjectURL(selectedImage);
+      }
+    };
+  }, [selectedImage]);
+
   const handleImageSelect = async (file: File) => {
     try {
       setIsCompressing(true);
