@@ -22,7 +22,7 @@ export default function AboutPage() {
             <span>How It Works</span>
           </h2>
           <ol className="space-y-2.5 text-sm text-slate-300 list-decimal pl-5 leading-relaxed">
-            <li>Type a description of your meal (e.g. &quot;2 scrambled eggs with toast and butter&quot;) or take a photo of your food.</li>
+            <li>Type a description of your meal (e.g. &quot;2 scrambled eggs with toast and butter&quot;) or take a photo of your food. You can also combine text and image for even better accuracy.</li>
             <li>The app sends your prompt or compressed photo directly to OpenAI using your stored API key.</li>
             <li>OpenAI evaluates the input and calculates accurate nutritional estimates (calories, protein, carbs, fat, fiber, grams).</li>
             <li>Review and customize the portion sizes using serving multipliers, then save directly to your local history.</li>

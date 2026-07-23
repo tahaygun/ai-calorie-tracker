@@ -11,6 +11,7 @@ describe('AboutPage', () => {
     expect(screen.getByText('100% Privacy-First')).toBeInTheDocument();
     expect(screen.getByText('Weight Progress Analytics')).toBeInTheDocument();
     expect(screen.getByText('Open Source Project')).toBeInTheDocument();
+    expect(screen.getByText(/combine text and image/i)).toBeInTheDocument();
 
     const githubLink = screen.getByRole('link', { name: /View GitHub Repository/i });
     expect(githubLink).toHaveAttribute('href', 'https://github.com/tahaygun/ai-calorie-tracker');
