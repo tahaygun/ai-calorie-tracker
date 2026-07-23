@@ -1,63 +1,22 @@
 'use client';
 
-import type { FoodItemNutrition } from '@/lib/openai';
+import { getDailyTotalsFromStorage } from '@/lib/utils/historyStorage';
 import type { MealEntry } from '@/lib/types';
 import React, { useState, useSyncExternalStore } from 'react';
 import { FaCalendarAlt, FaChevronRight } from 'react-icons/fa';
 import DayMealsModal from '../components/DayMealsModal';
 
-interface DailyTotal {
-  date: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-const emptySubscribe = () => () => {};
-
-function getDailyTotalsFromStorage(): DailyTotal[] {
-  if (typeof window === 'undefined') return [];
-
-  const keys = Object.keys(localStorage);
-  const mealKeys = keys.filter(key => key.startsWith('meals_'));
-
-  const totals = mealKeys.map(key => {
-    const date = key.replace('meals_', '');
-    const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
-
-    const dailyTotal = meals.reduce(
-      (total: DailyTotal, meal: MealEntry) => {
-        const mealTotal = meal.items.reduce(
-          (itemTotal: Omit<DailyTotal, 'date'>, item: FoodItemNutrition) => ({
-            calories: itemTotal.calories + item.nutrition.calories,
-            protein: itemTotal.protein + item.nutrition.protein,
-            carbs: itemTotal.carbs + item.nutrition.carbs,
-            fat: itemTotal.fat + item.nutrition.fat,
-          }),
-          { calories: 0, protein: 0, carbs: 0, fat: 0 }
-        );
-
-        return {
-          date,
-          calories: total.calories + mealTotal.calories,
-          protein: total.protein + mealTotal.protein,
-          carbs: total.carbs + mealTotal.carbs,
-          fat: total.fat + mealTotal.fat,
-        };
-      },
-      { date, calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-
-    return dailyTotal;
-  });
-
-  totals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  return totals;
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('local-storage-update', callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('local-storage-update', callback);
+  };
 }
 
 export default function History() {
-  const dailyTotals = useSyncExternalStore(emptySubscribe, getDailyTotalsFromStorage, () => []);
+  const dailyTotals = useSyncExternalStore(subscribe, getDailyTotalsFromStorage, () => []);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedMeals, setSelectedMeals] = useState<MealEntry[]>([]);
 

@@ -33,7 +33,6 @@ export async function POST(request: Request) {
     });
 
     const result = await openAIService.analyzeImageData(base64Image, description || undefined);
-    console.log(result, 'result');
     return NextResponse.json({
       message: 'Image analyzed successfully',
       nutritionData: result.data,
