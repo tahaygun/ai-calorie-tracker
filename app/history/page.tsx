@@ -1,7 +1,8 @@
 'use client';
+
 import type { FoodItemNutrition } from '@/lib/openai';
 import type { MealEntry } from '@/lib/types';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { FaCalendarAlt, FaChevronRight } from 'react-icons/fa';
 import DayMealsModal from '../components/DayMealsModal';
 
@@ -13,50 +14,52 @@ interface DailyTotal {
   fat: number;
 }
 
+const emptySubscribe = () => () => {};
+
+function getDailyTotalsFromStorage(): DailyTotal[] {
+  if (typeof window === 'undefined') return [];
+
+  const keys = Object.keys(localStorage);
+  const mealKeys = keys.filter(key => key.startsWith('meals_'));
+
+  const totals = mealKeys.map(key => {
+    const date = key.replace('meals_', '');
+    const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
+
+    const dailyTotal = meals.reduce(
+      (total: DailyTotal, meal: MealEntry) => {
+        const mealTotal = meal.items.reduce(
+          (itemTotal: Omit<DailyTotal, 'date'>, item: FoodItemNutrition) => ({
+            calories: itemTotal.calories + item.nutrition.calories,
+            protein: itemTotal.protein + item.nutrition.protein,
+            carbs: itemTotal.carbs + item.nutrition.carbs,
+            fat: itemTotal.fat + item.nutrition.fat,
+          }),
+          { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        );
+
+        return {
+          date,
+          calories: total.calories + mealTotal.calories,
+          protein: total.protein + mealTotal.protein,
+          carbs: total.carbs + mealTotal.carbs,
+          fat: total.fat + mealTotal.fat,
+        };
+      },
+      { date, calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
+
+    return dailyTotal;
+  });
+
+  totals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return totals;
+}
+
 export default function History() {
-  const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
+  const dailyTotals = useSyncExternalStore(emptySubscribe, getDailyTotalsFromStorage, () => []);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedMeals, setSelectedMeals] = useState<MealEntry[]>([]);
-
-  useEffect(() => {
-    // Get all localStorage keys
-    const keys = Object.keys(localStorage);
-    const mealKeys = keys.filter(key => key.startsWith('meals_'));
-
-    const totals = mealKeys.map(key => {
-      const date = key.replace('meals_', '');
-      const meals = JSON.parse(localStorage.getItem(key) || '[]') as MealEntry[];
-
-      const dailyTotal = meals.reduce(
-        (total: DailyTotal, meal: MealEntry) => {
-          const mealTotal = meal.items.reduce(
-            (itemTotal: Omit<DailyTotal, 'date'>, item: FoodItemNutrition) => ({
-              calories: itemTotal.calories + item.nutrition.calories,
-              protein: itemTotal.protein + item.nutrition.protein,
-              carbs: itemTotal.carbs + item.nutrition.carbs,
-              fat: itemTotal.fat + item.nutrition.fat,
-            }),
-            { calories: 0, protein: 0, carbs: 0, fat: 0 }
-          );
-
-          return {
-            date,
-            calories: total.calories + mealTotal.calories,
-            protein: total.protein + mealTotal.protein,
-            carbs: total.carbs + mealTotal.carbs,
-            fat: total.fat + mealTotal.fat,
-          };
-        },
-        { date, calories: 0, protein: 0, carbs: 0, fat: 0 }
-      );
-
-      return dailyTotal;
-    });
-
-    // Sort by date descending
-    totals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    setDailyTotals(totals);
-  }, []);
 
   const handleDayClick = (date: string) => {
     const meals = JSON.parse(localStorage.getItem(`meals_${date}`) || '[]') as MealEntry[];

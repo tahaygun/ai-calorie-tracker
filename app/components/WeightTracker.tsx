@@ -31,7 +31,48 @@ export default function WeightTracker() {
   const [newNote, setNewNote] = useState<string>('');
   const [newDate, setNewDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [chartData, setChartData] = useState<WeightChartData | null>(null);
+  const chartData = useMemo<WeightChartData | null>(() => {
+    if (isLoading) return null;
+
+    const sortedEntries = [...weights].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    if (sortedEntries.length === 0) return null;
+
+    const labels = sortedEntries.map(entry => formatDate(entry.date));
+    const weightData = sortedEntries.map(entry => entry.weight);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Weight (kg)',
+          data: weightData,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: '#60a5fa',
+          pointBorderColor: '#1d4ed8',
+          pointHoverRadius: 6,
+        },
+        ...(targetWeight
+          ? [
+              {
+                label: 'Target (kg)',
+                data: Array(labels.length).fill(targetWeight),
+                borderColor: '#10b981',
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0,
+                pointRadius: 0,
+              },
+            ]
+          : []),
+      ],
+    };
+  }, [weights, targetWeight, isLoading]);
 
   // Register Chart.js components on mount
   useEffect(() => {
@@ -98,49 +139,6 @@ export default function WeightTracker() {
       isWeightLoss: startWeight > targetWeight,
     };
   }, [weights, targetWeight]);
-
-  useEffect(() => {
-    if (isLoading) return;
-
-    const sortedEntries = [...weights].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-
-    if (sortedEntries.length === 0) return;
-
-    const labels = sortedEntries.map(entry => formatDate(entry.date));
-    const weightData = sortedEntries.map(entry => entry.weight);
-    const targetData = targetWeight ? Array(labels.length).fill(targetWeight) : [];
-
-    setChartData({
-      labels,
-      datasets: [
-        {
-          label: 'Weight (kg)',
-          data: weightData,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.3,
-          pointBackgroundColor: '#60a5fa',
-          pointBorderColor: '#1d4ed8',
-          pointHoverRadius: 6,
-        },
-        ...(targetWeight
-          ? [
-              {
-                label: 'Target (kg)',
-                data: targetData,
-                borderColor: '#ec4899',
-                backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                borderDash: [5, 5],
-                pointRadius: 0,
-              },
-            ]
-          : []),
-      ],
-    });
-  }, [weights, targetWeight, isLoading]);
 
   const handleAddWeight = (e: React.FormEvent) => {
     e.preventDefault();

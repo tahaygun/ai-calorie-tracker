@@ -8,7 +8,6 @@ const eslintConfig = [
     rules: {
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ];

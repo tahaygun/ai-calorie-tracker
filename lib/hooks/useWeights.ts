@@ -1,31 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import type { WeightEntry } from '../types';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useWeights() {
-  const [weights, setWeights] = useState<WeightEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load weights from localStorage on component mount
-  useEffect(() => {
-    try {
-      const storedWeights = localStorage.getItem('weight_entries');
-      setWeights(storedWeights ? JSON.parse(storedWeights) : []);
-    } catch (error) {
-      console.error('Error loading weight entries:', error);
-      setWeights([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Save weights to localStorage whenever they change
-  useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem('weight_entries', JSON.stringify(weights));
-    }
-  }, [weights, isLoading]);
+  const [weights, setWeights] = useLocalStorage<WeightEntry[]>('weight_entries', []);
+  const isLoading = false;
 
   // Add a new weight entry
   const addWeight = useCallback((weight: number, note?: string, date?: string) => {

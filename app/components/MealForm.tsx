@@ -1,5 +1,7 @@
 import { compressImage } from '@/lib/utils/clientImageProcessing';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
 import { FaCamera, FaImage, FaMagic, FaStar, FaTimes } from 'react-icons/fa';
 
 interface MealFormProps {
@@ -28,13 +30,9 @@ export default function MealForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [error, setError] = useState<string | null>(null);
   const [isCompressing, setIsCompressing] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     return () => {
