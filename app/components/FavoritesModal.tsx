@@ -1,11 +1,14 @@
 import type { MealEntry } from '@/lib/types';
+import React from 'react';
+import { FaStar, FaTimes } from 'react-icons/fa';
+import FavoriteMealItem from './FavoriteMealItem';
 
 interface FavoritesModalProps {
   isOpen: boolean;
   onClose: () => void;
   favorites: MealEntry[];
-  onSelect: (meal: MealEntry) => void;
-  onDelete: (id: string) => void;
+  onSelect: (_meal: MealEntry) => void;
+  onDelete: (_id: string) => void;
 }
 
 export default function FavoritesModal({
@@ -18,45 +21,37 @@ export default function FavoritesModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Favorite Meals</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
-            ✕
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 w-full max-w-md shadow-2xl shadow-black/50 space-y-4">
+        <div className="flex justify-between items-center pb-3 border-b border-slate-800/80">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <FaStar className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-100">Favorite Meals</h2>
+              <p className="text-xs text-slate-400">Quickly add meals to your daily log</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all"
+            aria-label="Close modal"
+          >
+            <FaTimes className="w-4 h-4" />
           </button>
         </div>
 
         {favorites.length === 0 ? (
-          <p className="text-gray-400 text-center py-4">No favorite meals yet</p>
+          <div className="text-center py-8 space-y-2">
+            <p className="text-slate-400 text-sm">No favorite meals saved yet</p>
+            <p className="text-xs text-slate-500">Star meals in your logged list to access them here</p>
+          </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
             {favorites.map(meal => (
-              <div key={meal.id} className="p-3 bg-gray-700 rounded">
-                <div className="flex justify-between items-start gap-2">
-                  <div>
-                    <p className="text-sm mb-1">{meal.description}</p>
-                    <p className="text-xs text-gray-400">
-                      {new Date(meal.timestamp).toLocaleDateString()} -{' '}
-                      {meal.items.reduce((sum, item) => sum + item.nutrition.calories, 0)} calories
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => onSelect(meal)}
-                      className="text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      Add
-                    </button>
-                    <button
-                      onClick={() => onDelete(meal.id)}
-                      className="text-sm text-red-400 hover:text-red-300"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <FavoriteMealItem key={meal.id} meal={meal} onSelect={onSelect} onDelete={onDelete} />
             ))}
           </div>
         )}

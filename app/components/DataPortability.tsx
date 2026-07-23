@@ -1,5 +1,6 @@
 import { exportUserData, importUserData, validateUserData } from '@/lib/exportImport';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { FaDownload, FaUpload } from 'react-icons/fa';
 
 export default function DataPortability() {
   const [importStatus, setImportStatus] = useState<{
@@ -11,23 +12,17 @@ export default function DataPortability() {
 
   const handleExport = () => {
     try {
-      // Get all user data
       const userData = exportUserData();
-
-      // Convert to JSON and create blob
       const jsonData = JSON.stringify(userData, null, 2);
       const blob = new Blob([jsonData], { type: 'application/json' });
 
-      // Create and trigger download
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
 
-      // Generate filename with current date
       const date = new Date().toISOString().split('T')[0];
       link.download = `calorie-tracker-export-${date}.json`;
 
-      // Trigger download and cleanup
       link.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -52,18 +47,15 @@ export default function DataPortability() {
         const jsonData = e.target?.result as string;
         const data = JSON.parse(jsonData);
 
-        // Validate the imported data
         const validation = validateUserData(data);
 
         if (validation.valid) {
-          // Import the data
           importUserData(data, { includeApiKey });
           setImportStatus({
             success: true,
             message: 'Data imported successfully. Reload the page to see changes.',
           });
 
-          // Reset file input
           if (fileInputRef.current) {
             fileInputRef.current.value = '';
           }
@@ -86,58 +78,63 @@ export default function DataPortability() {
   };
 
   return (
-    <div className="bg-gray-700 p-4 rounded-lg">
-      <h2 className="mb-4 font-medium text-lg">Data Portability</h2>
-      <p className="mb-4 text-gray-300 text-sm">
-        Export your data to use on another device or create a backup. Import previously exported
-        data to restore your settings and meal history.
-      </p>
+    <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-4">
+      <div>
+        <h3 className="font-semibold text-slate-100 text-sm">Backup & Restore</h3>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Export your meal logs and settings to JSON, or restore from a backup file.
+        </p>
+      </div>
 
-      <div className="flex flex-col space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <button
+          type="button"
           onClick={handleExport}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white transition-colors"
+          className="flex justify-center items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]"
         >
-          Export Data
+          <FaDownload className="w-3.5 h-3.5" />
+          <span>Export Data</span>
         </button>
 
-        <div>
-          <button
-            onClick={handleImportClick}
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded w-full text-white transition-colors"
-          >
-            Import Data
-          </button>
-
-          <div className="mt-2">
-            <label className="flex items-center text-sm">
-              <input
-                type="checkbox"
-                checked={includeApiKey}
-                onChange={e => setIncludeApiKey(e.target.checked)}
-                className="mr-2"
-              />
-              Include API key in import
-            </label>
-            <p className="mt-1 text-gray-400 text-xs">
-              When unchecked, your current API key will be preserved.
-            </p>
-          </div>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".json"
-            className="hidden"
-          />
-        </div>
+        <button
+          type="button"
+          onClick={handleImportClick}
+          className="flex justify-center items-center gap-2 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-semibold border border-slate-700 rounded-xl text-xs transition-all active:scale-[0.98]"
+        >
+          <FaUpload className="w-3.5 h-3.5" />
+          <span>Import Backup</span>
+        </button>
       </div>
+
+      <div className="pt-2 border-t border-slate-800/80 space-y-1">
+        <label className="flex items-center text-xs text-slate-300 font-medium cursor-pointer">
+          <input
+            type="checkbox"
+            checked={includeApiKey}
+            onChange={e => setIncludeApiKey(e.target.checked)}
+            className="mr-2 rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500/20"
+          />
+          Include API key in import
+        </label>
+        <p className="text-[11px] text-slate-500">
+          Uncheck to preserve your current device API key during import.
+        </p>
+      </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".json"
+        className="hidden"
+      />
 
       {importStatus && (
         <div
-          className={`mt-4 p-3 rounded text-sm ${
-            importStatus.success ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'
+          className={`p-3 rounded-xl text-xs font-medium ${
+            importStatus.success
+              ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
+              : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
           }`}
         >
           {importStatus.message}

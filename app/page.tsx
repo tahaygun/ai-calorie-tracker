@@ -127,8 +127,8 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-gray-100">
-      <main className="mx-auto p-4 max-w-2xl">
+    <div className="min-h-screen text-slate-100 pb-12">
+      <main className="mx-auto p-4 sm:p-6 max-w-2xl space-y-6">
         {!apiKey && <SettingsPrompt type="apiKey" />}
         {!targetCalories && <SettingsPrompt type="calorieTarget" />}
 
@@ -144,16 +144,16 @@ export default function Home() {
         />
 
         {dailyMeals.length > 0 && targetCalories > 0 && (
-          <div className="mt-4 mb-6">
+          <div className="my-6">
             <CalorieProgress totals={calculateDailyTotals()} targetCalories={targetCalories} />
           </div>
         )}
 
         {isEditing && editableItems.length > 0 && (
-          <div className="mt-6">
+          <div className="my-6 space-y-3">
             {editingMealId && (
-              <div className="bg-blue-900/30 mb-3 p-2 border border-blue-700/50 rounded text-blue-300 text-sm">
-                <p>Editing meal - make your changes and click &quot;Confirm&quot; to save</p>
+              <div className="bg-blue-500/10 p-3 border border-blue-500/30 rounded-xl text-blue-300 text-xs font-medium">
+                <p>✏️ Editing meal - make your changes and click &quot;Confirm & Save&quot;</p>
               </div>
             )}
             <NutritionEditor

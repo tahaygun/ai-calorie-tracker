@@ -1,29 +1,20 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
 import { useEffect, useRef, useState } from 'react';
-import { FaPen, FaTrash } from 'react-icons/fa';
+import { FaCheck, FaTimes } from 'react-icons/fa';
+import NutritionItemCard from './NutritionItemCard';
+import ServingSizeSelector from './ServingSizeSelector';
 
 // Extended type to include grams in nutrition data
 type ExtendedNutritionData = NutritionData & {
   grams: number;
 };
 
-// Common serving size options for quick selection
-const SERVING_SIZE_OPTIONS = [
-  { value: '0.25', label: '1/4' },
-  { value: '0.33', label: '1/3' },
-  { value: '0.5', label: '1/2' },
-  { value: '0.75', label: '3/4' },
-  { value: '1', label: '1' },
-  { value: '1.5', label: '1.5x' },
-  { value: '2', label: '2x' },
-];
-
 interface NutritionEditorProps {
   items: FoodItemNutrition[];
-  onUpdateItem: (itemIndex: number, field: keyof NutritionData, value: number) => void;
-  onUpdateItemName: (itemIndex: number, newName: string) => void;
-  onRemoveItem: (itemIndex: number) => void;
-  onConfirm: (adjustedItems: FoodItemNutrition[]) => void;
+  onUpdateItem: (_itemIndex: number, _field: keyof NutritionData, _value: number) => void;
+  onUpdateItemName: (_itemIndex: number, _newName: string) => void;
+  onRemoveItem: (_itemIndex: number) => void;
+  onConfirm: (_adjustedItems: FoodItemNutrition[]) => void;
   onCancel: () => void;
 }
 
@@ -251,85 +242,46 @@ export default function NutritionEditor({
     onConfirm(adjustedItems);
   };
 
-  // Render a nutrition input field with proper handlers
-  const renderNutritionInput = (itemIndex: number, field: keyof NutritionData, value: number) => (
-    <div key={field} className="flex flex-col">
-      <label className="mb-0.5 text-gray-400 text-xs">
-        {field.charAt(0).toUpperCase() + field.slice(1)}
-      </label>
-      <input
-        type="number"
-        value={getDisplayValue(itemIndex, field, value)}
-        onChange={e => handleInputChange(itemIndex, field, e.target.value)}
-        onBlur={commitChange}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            commitChange();
-          }
-        }}
-        className="bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full text-gray-100 text-sm"
-      />
-    </div>
-  );
-
   return (
-    <div className="bg-gray-800 p-3 border border-gray-700 rounded">
-      <h2 className="mb-2 font-semibold text-sm">Verify Nutrition Information</h2>
+    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-2xl shadow-black/40 backdrop-blur-md space-y-4">
+      <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
+        <div>
+          <h2 className="font-bold text-slate-100 text-base flex items-center gap-2">
+            <span>✨</span> Verify Nutrition Information
+          </h2>
+          <p className="text-xs text-slate-400">Review AI-estimated nutrients and adjust portions</p>
+        </div>
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          {items.length} {items.length === 1 ? 'item' : 'items'}
+        </span>
+      </div>
 
       {/* List of food items with editable fields */}
       <div className="space-y-3">
         {items.map((item, itemIndex) => (
-          <div key={itemIndex} className="bg-gray-700 p-2.5 rounded">
-            <div className="flex justify-between items-center mb-2">
-              {activeNameEdit && activeNameEdit.itemIndex === itemIndex ? (
-                <input
-                  type="text"
-                  value={activeNameEdit.value}
-                  onChange={e => handleNameChange(itemIndex, e.target.value)}
-                  onBlur={commitNameChange}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      commitNameChange();
-                    }
-                  }}
-                  className="bg-gray-600 px-2 py-1 border border-gray-500 rounded w-full font-medium text-gray-100 text-sm"
-                  autoFocus
-                />
-              ) : (
-                <div className="flex items-center">
-                  <p className="font-medium text-sm">{item.item}</p>
-                  <button
-                    onClick={() => setActiveNameEdit({ itemIndex, value: item.item })}
-                    className="ml-2 p-0.5 text-gray-400 hover:text-white"
-                    title="Edit item name"
-                  >
-                    <FaPen className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-              <button
-                onClick={() => onRemoveItem(itemIndex)}
-                className="p-1 text-red-400 hover:text-red-300"
-                title="Remove item"
-              >
-                <FaTrash className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Nutrition input fields grid */}
-            <div className="gap-2 grid grid-cols-3 md:grid-cols-5">
-              {Object.entries(item.nutrition).map(([key, value]) =>
-                renderNutritionInput(itemIndex, key as keyof NutritionData, value)
-              )}
-            </div>
-          </div>
+          <NutritionItemCard
+            key={itemIndex}
+            itemIndex={itemIndex}
+            item={item}
+            activeNameEdit={activeNameEdit}
+            handleNameChange={handleNameChange}
+            commitNameChange={commitNameChange}
+            setActiveNameEdit={setActiveNameEdit}
+            onRemoveItem={onRemoveItem}
+            getDisplayValue={getDisplayValue}
+            handleInputChange={handleInputChange}
+            commitChange={commitChange}
+          />
         ))}
       </div>
 
       {/* Nutrition totals summary (only shown when multiple items exist) */}
       {items.length > 1 ? (
-        <div className="mt-2.5 pt-2 border-gray-600 border-t">
-          <div className="gap-2 grid grid-cols-3 md:grid-cols-5 text-xs">
+        <div className="pt-3 border-t border-slate-800/80">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">
+            Combined Meal Totals
+          </span>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {Object.keys(items[0]?.nutrition || {}).map(key => {
               // Calculate totals with serving size adjustments
               const total = !isInitialized.current
@@ -348,12 +300,12 @@ export default function NutritionEditor({
               return (
                 <div
                   key={key}
-                  className="flex flex-col items-center bg-gray-900 px-2 py-1.5 rounded"
+                  className="flex flex-col items-center bg-slate-950/60 p-2 rounded-xl border border-slate-800/80"
                 >
-                  <span className="text-gray-400">
-                    Total {key.charAt(0).toUpperCase() + key.slice(1)}
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                    {key}
                   </span>
-                  <span className="font-bold text-green-400 text-sm">{total.toFixed(1)}</span>
+                  <span className="font-bold text-emerald-400 text-sm font-mono">{total.toFixed(1)}</span>
                 </div>
               );
             })}
@@ -362,66 +314,30 @@ export default function NutritionEditor({
       ) : null}
 
       {/* Serving Size Adjustment Section */}
-      <div className="mt-4 pt-4 border-gray-700 border-t">
-        <div className="flex flex-col gap-3">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-300">Serving:</span>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min="0.1"
-                max="10"
-                step="0.1"
-                value={activeServingEdit}
-                onChange={e => handleServingSizeChange(e.target.value)}
-                onBlur={commitServingSizeChange}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    commitServingSizeChange();
-                  }
-                }}
-                className="bg-gray-700 px-2 py-1 border border-gray-600 rounded w-16 text-gray-100 text-sm text-center"
-              />
-              <span className="text-gray-400">serving(s)</span>
-            </div>
-          </div>
-
-          {/* Serving size quick selection buttons */}
-          <div className="flex justify-center gap-2 mt-1">
-            {SERVING_SIZE_OPTIONS.map(option => (
-              <button
-                key={option.value}
-                onClick={() => handleServingSizeButtonClick(option.value)}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  Math.abs(parseFloat(activeServingEdit) - parseFloat(option.value)) < 0.01
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="text-gray-400 text-xs text-center">
-            Adjust serving size to scale all nutrition values
-          </div>
-        </div>
-      </div>
+      <ServingSizeSelector
+        activeServingEdit={activeServingEdit}
+        onServingChange={handleServingSizeChange}
+        onCommit={commitServingSizeChange}
+        onButtonClick={handleServingSizeButtonClick}
+      />
 
       {/* Action buttons */}
-      <div className="flex justify-center gap-2 mt-3">
+      <div className="flex justify-end gap-3 pt-3 border-t border-slate-800/80">
         <button
-          onClick={handleConfirm}
-          className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded font-medium text-sm transition-colors"
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all flex items-center gap-1.5 active:scale-[0.98]"
         >
-          Confirm & Save
+          <FaTimes className="w-3.5 h-3.5" />
+          <span>Cancel</span>
         </button>
         <button
-          onClick={onCancel}
-          className="bg-gray-600 hover:bg-gray-700 px-3 py-1.5 rounded text-sm transition-colors"
+          type="button"
+          onClick={handleConfirm}
+          className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98] flex items-center gap-2 cursor-pointer"
         >
-          Cancel
+          <FaCheck className="w-3.5 h-3.5" />
+          <span>Confirm & Save</span>
         </button>
       </div>
     </div>

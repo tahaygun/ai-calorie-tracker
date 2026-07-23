@@ -14,12 +14,11 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { FaChevronDown, FaChevronUp, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaPlus, FaTrash } from 'react-icons/fa';
+import WeightStatCard from './WeightStatCard';
 
-// Instead of registering at module level, we'll register in an effect
-// This ensures it only happens on client-side when component is mounted
 let chartRegistered = false;
 
 type WeightChartData = ChartData<'line', number[], string>;
@@ -30,7 +29,7 @@ export default function WeightTracker() {
 
   const [newWeight, setNewWeight] = useState<string>('');
   const [newNote, setNewNote] = useState<string>('');
-  const [newDate, setNewDate] = useState<string>(new Date().toISOString().split('T')[0]); // Default to today's date in YYYY-MM-DD format
+  const [newDate, setNewDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [chartData, setChartData] = useState<WeightChartData | null>(null);
 
@@ -50,7 +49,6 @@ export default function WeightTracker() {
     }
   }, []);
 
-  // Format date for display
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -60,7 +58,6 @@ export default function WeightTracker() {
     }).format(date);
   };
 
-  // Calculate weight statistics
   const weightStats = useMemo(() => {
     if (weights.length === 0) return null;
 
@@ -76,22 +73,17 @@ export default function WeightTracker() {
     const weightChange = currentWeight - startWeight;
     const weightChangePercent = (weightChange / startWeight) * 100;
 
-    // Calculate progress towards target if target weight is set
     let progressPercent = 0;
     if (targetWeight > 0) {
-      // Different calculation based on whether we're trying to lose or gain weight
       if (startWeight > targetWeight) {
-        // Weight loss goal
         const totalToLose = startWeight - targetWeight;
         const lost = startWeight - currentWeight;
         progressPercent = Math.min(100, Math.max(0, (lost / totalToLose) * 100));
       } else if (startWeight < targetWeight) {
-        // Weight gain goal
         const totalToGain = targetWeight - startWeight;
         const gained = currentWeight - startWeight;
         progressPercent = Math.min(100, Math.max(0, (gained / totalToGain) * 100));
       } else {
-        // Already at target
         progressPercent = 100;
       }
     }
@@ -104,47 +96,43 @@ export default function WeightTracker() {
       progressPercent,
       entries: sortedEntries.length,
       isWeightLoss: startWeight > targetWeight,
-      duration: Math.ceil(
-        (new Date(lastEntry.date).getTime() - new Date(firstEntry.date).getTime()) /
-          (1000 * 60 * 60 * 24)
-      ),
     };
   }, [weights, targetWeight]);
 
-  // Prepare chart data
   useEffect(() => {
     if (isLoading) return;
 
-    // Move sorting logic inside the effect instead of using getSortedWeights
     const sortedEntries = [...weights].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    ); // Oldest to newest for the chart
+    );
 
     if (sortedEntries.length === 0) return;
 
     const labels = sortedEntries.map(entry => formatDate(entry.date));
     const weightData = sortedEntries.map(entry => entry.weight);
-
-    // Create target weight line if set
     const targetData = targetWeight ? Array(labels.length).fill(targetWeight) : [];
 
     setChartData({
       labels,
       datasets: [
         {
-          label: 'Weight',
+          label: 'Weight (kg)',
           data: weightData,
-          borderColor: 'rgb(75, 192, 192)',
-          backgroundColor: 'rgba(75, 192, 192, 0.5)',
-          tension: 0.1,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: '#60a5fa',
+          pointBorderColor: '#1d4ed8',
+          pointHoverRadius: 6,
         },
         ...(targetWeight
           ? [
               {
-                label: 'Target',
+                label: 'Target (kg)',
                 data: targetData,
-                borderColor: 'rgba(255, 99, 132, 0.7)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: '#ec4899',
+                backgroundColor: 'rgba(236, 72, 153, 0.1)',
                 borderDash: [5, 5],
                 pointRadius: 0,
               },
@@ -152,7 +140,7 @@ export default function WeightTracker() {
           : []),
       ],
     });
-  }, [weights, targetWeight, isLoading]); // Removed getSortedWeights from dependencies
+  }, [weights, targetWeight, isLoading]);
 
   const handleAddWeight = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,14 +148,11 @@ export default function WeightTracker() {
     const weightValue = parseFloat(newWeight);
     if (isNaN(weightValue) || weightValue <= 0) return;
 
-    // Create ISO string from the date input (which is in YYYY-MM-DD format)
-    // Set the time to noon to avoid timezone issues
     const dateISO = new Date(`${newDate}T12:00:00`).toISOString();
 
     addWeight(weightValue, newNote.trim() || undefined, dateISO);
     setNewWeight('');
     setNewNote('');
-    // Reset date to today after submission
     setNewDate(new Date().toISOString().split('T')[0]);
   };
 
@@ -177,7 +162,6 @@ export default function WeightTracker() {
     }
   };
 
-  // Helper function to get the previous weight entry for comparison
   const getPreviousEntry = (currentEntry: WeightEntry): WeightEntry | null => {
     if (weights.length <= 1) return null;
 
@@ -192,85 +176,58 @@ export default function WeightTracker() {
   };
 
   if (isLoading) {
-    return <div className="py-4 text-center">Loading weight data...</div>;
+    return <div className="py-8 text-center text-slate-400 font-mono">Loading weight data...</div>;
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {weightStats && (
-        <div className="bg-gray-800 shadow-lg p-4 rounded-lg">
-          <div className="gap-2 grid grid-cols-3 mb-3">
-            <div className="bg-gray-700 p-2 rounded-lg text-center">
-              <div className="text-gray-400 text-xs">Start</div>
-              <div className="font-bold text-base sm:text-lg">{weightStats.startWeight} kg</div>
-            </div>
-
-            <div className="bg-gray-700 p-2 rounded-lg text-center">
-              <div className="text-gray-400 text-xs">Current</div>
-              <div className="font-bold text-base sm:text-lg">{weightStats.currentWeight} kg</div>
-            </div>
-
-            <div className="bg-gray-700 p-2 rounded-lg text-center">
-              <div className="text-gray-400 text-xs">Change</div>
-              <div
-                className={`font-bold text-base sm:text-lg flex items-center justify-center ${
-                  weightStats.weightChange === 0
-                    ? 'text-gray-300'
-                    : weightStats.weightChange < 0
-                      ? 'text-green-400'
-                      : 'text-red-400'
-                }`}
-              >
-                {weightStats.weightChange > 0 ? '+' : ''}
-                {weightStats.weightChange.toFixed(1)}
-                {weightStats.weightChange !== 0 && (
-                  <span className="ml-1">
-                    {weightStats.weightChange < 0 ? (
-                      <FaChevronUp className="w-4 h-4" />
-                    ) : (
-                      <FaChevronDown className="w-4 h-4" />
-                    )}
-                  </span>
-                )}
-              </div>
-            </div>
+        <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-2xl shadow-xl space-y-4 backdrop-blur-md">
+          <div className="grid grid-cols-3 gap-3">
+            <WeightStatCard label="Start" value={`${weightStats.startWeight} kg`} />
+            <WeightStatCard label="Current" value={`${weightStats.currentWeight} kg`} accentClass="text-blue-400" />
+            <WeightStatCard
+              label="Change"
+              value={`${weightStats.weightChange > 0 ? '+' : ''}${weightStats.weightChange.toFixed(1)} kg`}
+              accentClass={
+                weightStats.weightChange === 0
+                  ? 'text-slate-300'
+                  : weightStats.weightChange < 0
+                    ? 'text-emerald-400'
+                    : 'text-rose-400'
+              }
+            />
           </div>
 
           {targetWeight > 0 && (
-            <div>
-              <div className="flex justify-between items-center mb-1 text-xs">
-                <span className="text-gray-400">
-                  Progress: {weightStats.progressPercent.toFixed(0)}%
-                </span>
-                <span className="text-gray-400">
-                  {Math.abs(targetWeight - weightStats.currentWeight).toFixed(1)} kg to go
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs font-mono">
+                <span className="text-slate-400">Target Progress</span>
+                <span className="text-emerald-400 font-bold">
+                  {weightStats.progressPercent.toFixed(0)}% ({Math.abs(targetWeight - weightStats.currentWeight).toFixed(1)} kg to go)
                 </span>
               </div>
-              <div className="bg-gray-700 mb-1 rounded-full w-full h-2">
+              <div className="bg-slate-950/80 rounded-full w-full h-3 p-0.5 border border-slate-800 overflow-hidden">
                 <div
-                  className="rounded-full h-2 transition-all duration-500"
-                  style={{
-                    width: `${weightStats.progressPercent}%`,
-                    backgroundColor: weightStats.isWeightLoss ? '#4ade80' : '#8b5cf6',
-                  }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-gray-400 text-xs">
-                <div>{weightStats.startWeight} kg</div>
-                <div>{targetWeight} kg</div>
+                  className="rounded-full h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 shadow-md shadow-emerald-500/20"
+                  style={{ width: `${weightStats.progressPercent}%` }}
+                />
               </div>
             </div>
           )}
         </div>
       )}
 
-      <div className="bg-gray-800 shadow-lg p-6 rounded-lg">
-        <h2 className="mb-4 font-semibold text-xl">Track Your Weight</h2>
+      {/* Log weight entry form */}
+      <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
+        <h2 className="font-bold text-slate-100 text-base flex items-center gap-2">
+          <span>⚖️</span> Log Weight Entry
+        </h2>
 
         <form onSubmit={handleAddWeight} className="space-y-4">
-          <div className="flex sm:flex-row flex-col gap-3">
-            <div className="flex-1">
-              <label htmlFor="weight" className="block mb-1 font-medium text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label htmlFor="weight" className="block mb-1 font-semibold text-xs text-slate-300">
                 Weight (kg)
               </label>
               <input
@@ -278,15 +235,15 @@ export default function WeightTracker() {
                 id="weight"
                 value={newWeight}
                 onChange={e => setNewWeight(e.target.value)}
-                placeholder="Enter weight"
-                className="bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100"
+                placeholder="75.5"
+                className="w-full bg-slate-950/80 border border-slate-800 focus:border-blue-500/80 focus:ring-2 focus:ring-blue-500/20 rounded-xl text-slate-100 p-2.5 text-sm outline-none font-mono"
                 step="0.1"
                 min="0"
                 required
               />
             </div>
-            <div className="flex-1">
-              <label htmlFor="date" className="block mb-1 font-medium text-sm">
+            <div>
+              <label htmlFor="date" className="block mb-1 font-semibold text-xs text-slate-300">
                 Date
               </label>
               <input
@@ -294,13 +251,13 @@ export default function WeightTracker() {
                 id="date"
                 value={newDate}
                 onChange={e => setNewDate(e.target.value)}
-                className="bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100"
-                max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                className="w-full bg-slate-950/80 border border-slate-800 focus:border-blue-500/80 focus:ring-2 focus:ring-blue-500/20 rounded-xl text-slate-100 p-2.5 text-sm outline-none font-mono"
+                max={new Date().toISOString().split('T')[0]}
                 required
               />
             </div>
-            <div className="flex-1">
-              <label htmlFor="note" className="block mb-1 font-medium text-sm">
+            <div>
+              <label htmlFor="note" className="block mb-1 font-semibold text-xs text-slate-300">
                 Note (optional)
               </label>
               <input
@@ -308,23 +265,25 @@ export default function WeightTracker() {
                 id="note"
                 value={newNote}
                 onChange={e => setNewNote(e.target.value)}
-                placeholder="Add a note"
-                className="bg-gray-700 p-2 border border-gray-600 rounded w-full text-gray-100"
+                placeholder="Post workout..."
+                className="w-full bg-slate-950/80 border border-slate-800 focus:border-blue-500/80 focus:ring-2 focus:ring-blue-500/20 rounded-xl text-slate-100 p-2.5 text-sm outline-none"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded w-full text-sm transition-colors"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 active:scale-[0.99]"
           >
-            Add Weight Entry
+            <FaPlus className="w-3.5 h-3.5" />
+            <span>Save Weight Entry</span>
           </button>
         </form>
       </div>
 
+      {/* Chart visualization */}
       {chartData && (
-        <div className="bg-gray-800 shadow-lg p-6 rounded-lg">
-          <h2 className="mb-4 font-semibold text-xl">Weight Progress</h2>
+        <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
+          <h2 className="font-bold text-slate-100 text-base">Weight Progress Chart</h2>
           <div className="h-64 sm:h-80">
             <Line
               data={chartData}
@@ -335,18 +294,20 @@ export default function WeightTracker() {
                   y: {
                     beginAtZero: false,
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)',
+                      color: 'rgba(51, 65, 85, 0.4)',
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      color: '#94a3b8',
+                      font: { family: 'monospace' },
                     },
                   },
                   x: {
                     grid: {
-                      color: 'rgba(255, 255, 255, 0.1)',
+                      color: 'rgba(51, 65, 85, 0.4)',
                     },
                     ticks: {
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      color: '#94a3b8',
+                      font: { family: 'monospace' },
                       maxRotation: 45,
                       minRotation: 45,
                     },
@@ -355,47 +316,42 @@ export default function WeightTracker() {
                 plugins: {
                   legend: {
                     labels: {
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      color: '#f8fafc',
                     },
                   },
                   tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(51, 65, 85, 0.8)',
+                    borderWidth: 1,
                   },
                 },
               }}
             />
           </div>
-
-          {targetWeight > 0 && (
-            <div className="mt-4 text-center">
-              <p className="text-gray-400 text-sm">
-                Target weight:{' '}
-                <span className="font-semibold text-pink-400">{targetWeight} kg</span>
-              </p>
-            </div>
-          )}
         </div>
       )}
 
-      <div className="bg-gray-800 shadow-lg p-6 rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-xl">Weight History</h2>
+      {/* History table */}
+      <div className="bg-slate-900/70 border border-slate-800/80 p-5 rounded-2xl shadow-xl backdrop-blur-md space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="font-bold text-slate-100 text-base">Weight Log History</h2>
           <button
+            type="button"
             onClick={() => setEditMode(!editMode)}
-            className="text-gray-300 hover:text-white text-sm"
+            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl border border-slate-700 transition-all"
           >
-            {editMode ? 'Done' : 'Edit'}
+            {editMode ? 'Done' : 'Manage Log'}
           </button>
         </div>
 
         {weights.length === 0 ? (
-          <p className="py-4 text-gray-400 text-center">
-            No weight entries yet. Add your first entry above.
-          </p>
+          <p className="py-6 text-slate-400 text-sm text-center">No weight entries logged yet.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {[...weights]
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Sort by date, newest first
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((entry: WeightEntry) => {
                 const prevEntry = getPreviousEntry(entry);
                 const weightDiff = prevEntry ? entry.weight - prevEntry.weight : 0;
@@ -403,37 +359,47 @@ export default function WeightTracker() {
                 return (
                   <div
                     key={entry.id}
-                    className="flex justify-between items-center bg-gray-700 hover:bg-gray-650 p-3 rounded transition-colors"
+                    className="flex justify-between items-center bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl transition-all"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center font-medium">
-                        {entry.weight} kg
+                      <div className="flex items-center font-bold text-slate-100 text-base font-mono">
+                        <span>{entry.weight} kg</span>
                         {prevEntry && (
                           <span
-                            className={`ml-2 text-sm ${
+                            className={`ml-2 text-xs flex items-center gap-0.5 px-2 py-0.5 rounded-full font-mono ${
                               weightDiff === 0
-                                ? 'text-gray-400'
+                                ? 'bg-slate-800 text-slate-400'
                                 : weightDiff < 0
-                                  ? 'text-green-400'
-                                  : 'text-red-400'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                             }`}
                           >
                             {weightDiff > 0 ? '+' : ''}
                             {weightDiff.toFixed(1)} kg
+                            {weightDiff !== 0 && (
+                              <span>
+                                {weightDiff < 0 ? (
+                                  <FaChevronDown className="w-3 h-3" />
+                                ) : (
+                                  <FaChevronUp className="w-3 h-3" />
+                                )}
+                              </span>
+                            )}
                           </span>
                         )}
                       </div>
-                      <div className="text-gray-400 text-sm">{formatDate(entry.date)}</div>
-                      {entry.note && <div className="mt-1 text-gray-300 text-xs">{entry.note}</div>}
+                      <div className="text-slate-400 text-xs mt-0.5">{formatDate(entry.date)}</div>
+                      {entry.note && <div className="mt-1 text-slate-300 text-xs italic">&quot;{entry.note}&quot;</div>}
                     </div>
 
                     {editMode && (
                       <button
+                        type="button"
                         onClick={() => handleDeleteEntry(entry.id)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
+                        className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-colors"
                         aria-label="Delete entry"
                       >
-                        <FaTrash className="w-5 h-5" />
+                        <FaTrash className="w-4 h-4" />
                       </button>
                     )}
                   </div>

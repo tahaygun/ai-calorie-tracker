@@ -1,12 +1,12 @@
 import { compressImage } from '@/lib/utils/clientImageProcessing';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaImage, FaStar } from 'react-icons/fa';
+import { FaCamera, FaImage, FaMagic, FaStar, FaTimes } from 'react-icons/fa';
 
 interface MealFormProps {
   mealDescription: string;
-  setMealDescription: (description: string) => void;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  onImageUpload: (file: File) => Promise<void>;
+  setMealDescription: (_description: string) => void;
+  onSubmit: (_e: React.FormEvent) => Promise<void>;
+  onImageUpload: (_file: File) => Promise<void>;
   isLoading: boolean;
   tokenUsage?: {
     totalTokens: number;
@@ -111,40 +111,47 @@ export default function MealForm({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-5 shadow-xl shadow-black/30 backdrop-blur-md space-y-4">
       <div className="flex justify-between items-center">
-        <label htmlFor="mealDescription" className="font-medium text-sm">
-          What did you eat? (Separate items with commas)
-        </label>
+        <div>
+          <label htmlFor="mealDescription" className="font-semibold text-slate-100 text-base block">
+            What did you eat?
+          </label>
+          <p className="text-xs text-slate-400">Describe items or upload a meal photo for AI analysis</p>
+        </div>
         <button
           type="button"
           onClick={onOpenFavorites}
-          className="p-2 hover:text-yellow-300 text-sm transition-colors"
-          aria-label="Open favorite meals"
+          className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-sm flex items-center gap-1.5 text-xs font-semibold"
+          aria-label="Open favorite meals text"
         >
-          <FaStar className="w-6 h-6 text-yellow-400" />
+          <FaStar className="w-4 h-4 text-amber-400" />
+          <span className="hidden sm:inline">Favorites</span>
         </button>
       </div>
 
-      <form onSubmit={handleFormSubmit} className="space-y-3">
-        <textarea
-          id="mealDescription"
-          value={mealDescription}
-          onChange={e => setMealDescription(e.target.value)}
-          className="bg-gray-800 p-2 border border-gray-700 rounded w-full text-gray-100 placeholder-gray-400"
-          placeholder={
-            selectedImage
-              ? 'Add a description of your meal if needed here.'
-              : 'Example: 2 eggs, 1 slice of toast, 1 apple'
-          }
-          rows={3}
-          required={selectedFile === null}
-          disabled={isLoading}
-        />
+      <form onSubmit={handleFormSubmit} className="space-y-4">
+        <div className="relative">
+          <textarea
+            id="mealDescription"
+            value={mealDescription}
+            onChange={e => setMealDescription(e.target.value)}
+            className="w-full bg-slate-950/80 border border-slate-800 focus:border-blue-500/80 focus:ring-2 focus:ring-blue-500/20 rounded-xl text-slate-100 placeholder-slate-500 p-3.5 text-sm transition-all outline-none resize-y min-h-[90px] shadow-inner font-sans"
+            placeholder={
+              selectedImage
+                ? 'Add an optional description of your meal here...'
+                : 'e.g., 2 eggs, 1 slice of toast with butter, 1 apple'
+            }
+            rows={3}
+            required={selectedFile === null}
+            disabled={isLoading}
+          />
+        </div>
 
         {error && (
-          <div className="bg-red-900/50 p-3 border border-red-700 rounded text-red-200 text-sm">
-            {error}
+          <div className="bg-rose-500/10 p-3.5 border border-rose-500/30 rounded-xl text-rose-300 text-xs font-medium flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
@@ -178,38 +185,32 @@ export default function MealForm({
           />
 
           {selectedImage ? (
-            <div className="flex justify-center space-y-2">
-              <div className="relative">
-                <img src={selectedImage} alt="Selected food" className="rounded max-h-32" />
+            <div className="flex justify-center">
+              <div className="relative group rounded-2xl overflow-hidden border border-slate-700/80 shadow-md">
+                <img src={selectedImage} alt="Selected food preview" className="max-h-40 object-cover" />
                 <button
                   type="button"
                   onClick={e => {
                     e.stopPropagation();
                     handleDeleteImage();
                   }}
-                  className="-top-2 -right-2 absolute bg-red-500 hover:bg-red-600 p-1 rounded-full text-white"
+                  className="absolute top-2 right-2 bg-slate-900/90 hover:bg-rose-600 border border-slate-700 p-1.5 rounded-full text-white transition-all shadow-lg"
                   disabled={isLoading || isCompressing}
+                  aria-label="Remove image"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <FaTimes className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => !isLoading && !isCompressing && fileInputRef.current?.click()}
-                className="flex flex-1 justify-center items-center gap-2 hover:bg-gray-700 p-2 border border-gray-700 rounded transition-colors"
+                className="flex justify-center items-center gap-2 py-2.5 px-3 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm active:scale-[0.98]"
                 disabled={isLoading || isCompressing}
               >
-                <FaImage className="w-5 h-5 text-gray-400" />
+                <FaImage className="w-4 h-4 text-blue-400" />
                 Upload Image
               </button>
               <button
@@ -220,28 +221,10 @@ export default function MealForm({
                     cameraInput.click();
                   }
                 }}
-                className="flex flex-1 justify-center items-center gap-2 hover:bg-gray-700 p-2 border border-gray-700 rounded transition-colors"
+                className="flex justify-center items-center gap-2 py-2.5 px-3 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm active:scale-[0.98]"
                 disabled={isLoading || isCompressing}
               >
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+                <FaCamera className="w-4 h-4 text-emerald-400" />
                 Take Photo
               </button>
             </div>
@@ -249,22 +232,34 @@ export default function MealForm({
         </div>
 
         {tokenUsage && (
-          <div className="space-y-1 text-gray-400 text-xs">
-            <p>Token Usage:</p>
-            <div className="gap-2 grid grid-cols-3">
-              <div>Total: {tokenUsage.totalTokens}</div>
-              <div>Prompt: {tokenUsage.promptTokens}</div>
-              <div>Completion: {tokenUsage.completionTokens}</div>
-            </div>
+          <div className="p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <span>Tokens: {tokenUsage.totalTokens}</span>
+            <span>Prompt: {tokenUsage.promptTokens}</span>
+            <span>Completion: {tokenUsage.completionTokens}</span>
           </div>
         )}
 
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 px-4 py-2 rounded w-full text-sm transition-colors disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-800 disabled:to-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-sm transition-all shadow-lg shadow-blue-500/20 disabled:shadow-none disabled:text-slate-500 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
           disabled={isLoading || isCompressing}
         >
-          {isLoading ? 'Analyzing...' : isCompressing ? 'Compressing...' : 'Analyze Meal'}
+          {isLoading ? (
+            <>
+              <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Analyzing Meal with AI...</span>
+            </>
+          ) : isCompressing ? (
+            <span>Optimizing Image...</span>
+          ) : (
+            <>
+              <FaMagic className="w-4 h-4" />
+              <span>Analyze Meal</span>
+            </>
+          )}
         </button>
       </form>
     </div>

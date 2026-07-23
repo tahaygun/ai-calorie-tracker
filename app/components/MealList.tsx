@@ -24,8 +24,16 @@ export default function MealList({
   });
 
   return (
-    <div className="mt-6">
-      <h3 className="mb-2 font-semibold text-sm">Logged Meals</h3>
+    <div className="space-y-4 pt-2">
+      <div className="flex justify-between items-center px-1">
+        <h3 className="font-bold text-slate-100 text-base flex items-center gap-2">
+          <span>🍽️</span> Logged Meals
+        </h3>
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700/60">
+          {sortedMeals.length} {sortedMeals.length === 1 ? 'meal' : 'meals'} logged
+        </span>
+      </div>
+
       <div className="space-y-3">
         {sortedMeals.map(meal => (
           <MealItem
