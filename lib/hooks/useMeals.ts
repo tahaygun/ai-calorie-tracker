@@ -1,46 +1,25 @@
 import type { FoodItemNutrition, NutritionData } from '@/lib/openai';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { MealEntry, NutritionTotals } from '../types';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useMeals() {
-  const initialDateRef = useRef(new Date().toISOString().split('T')[0]);
-  const [currentDate, setCurrentDate] = useState('');
+  const [currentDate] = useState(() => (typeof window !== 'undefined' ? new Date().toISOString().split('T')[0] : ''));
   const [mealDescription, setMealDescription] = useState('');
-  const [dailyMeals, setDailyMeals] = useState<MealEntry[]>([]);
+  const [dailyMeals, setDailyMeals] = useLocalStorage<MealEntry[]>(
+    currentDate ? `meals_${currentDate}` : 'meals_today',
+    []
+  );
   const [editableItems, setEditableItems] = useState<FoodItemNutrition[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Set initial date on mount
-  useEffect(() => {
-    setCurrentDate(initialDateRef.current);
-  }, []);
-
-  // Load meals from localStorage when currentDate is set
-  useEffect(() => {
-    if (!currentDate) return;
-
-    const storedMeals = localStorage.getItem(`meals_${currentDate}`);
-    if (storedMeals) {
-      setDailyMeals(JSON.parse(storedMeals));
-    } else {
-      setDailyMeals([]);
-    }
-  }, [currentDate]);
-
-  // Save meals whenever they change
-  useEffect(() => {
-    if (!currentDate) return;
-    localStorage.setItem(`meals_${currentDate}`, JSON.stringify(dailyMeals));
-  }, [dailyMeals, currentDate]);
-
   // Check for date changes
   useEffect(() => {
-    if (!currentDate) return;
-
+    const todayAtMount = new Date().toISOString().split('T')[0];
     const checkDate = () => {
       const today = new Date().toISOString().split('T')[0];
-      if (today !== currentDate) {
+      if (today !== todayAtMount) {
         // If date has changed, reload the page to reset the state
         window.location.reload();
       }
@@ -48,7 +27,7 @@ export function useMeals() {
 
     const interval = setInterval(checkDate, 60000);
     return () => clearInterval(interval);
-  }, [currentDate]);
+  }, []);
 
   const calculateDailyTotals = (): NutritionTotals => {
     return dailyMeals.reduce(

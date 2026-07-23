@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "svg-to-png": "node scripts/svg-to-png.js",
     "icons": "npm run svg-to-png && node scripts/generate-icons.js",
     "format": "prettier --write .",

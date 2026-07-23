@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 import type { MealEntry } from '../types';
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<MealEntry[]>([]);
-  const [firstLoad, setFirstLoad] = useState(true);
-
-  useEffect(() => {
-    const storedFavorites = localStorage.getItem('favorite_meals');
-    setFavorites(JSON.parse(storedFavorites || '[]'));
-    setFirstLoad(false);
-  }, []);
-
-  useEffect(() => {
-    if (!firstLoad) {
-      localStorage.setItem('favorite_meals', JSON.stringify(favorites));
-    }
-  }, [favorites, firstLoad]);
+  const [favorites, setFavorites] = useLocalStorage<MealEntry[]>('favorite_meals', []);
 
   const toggleFavorite = (meal: MealEntry) => {
     const isFavorite = favorites.some(fav => fav.id === meal.id);

@@ -284,7 +284,7 @@ export default function NutritionEditor({
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {Object.keys(items[0]?.nutrition || {}).map(key => {
               // Calculate totals with serving size adjustments
-              const total = !isInitialized.current
+              const total = originalItems.length === 0
                 ? items.reduce(
                     (sum, item) => sum + (item.nutrition[key as keyof NutritionData] || 0),
                     0

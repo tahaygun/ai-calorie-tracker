@@ -1,5 +1,6 @@
+import { useFavorites } from '@/lib/hooks/useFavorites';
 import type { MealEntry } from '@/lib/types';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaCalendarAlt, FaTimes } from 'react-icons/fa';
 import MealItem from './MealItem';
 
@@ -11,38 +12,7 @@ interface DayMealsModalProps {
 }
 
 export default function DayMealsModal({ isOpen, onClose, date, meals }: DayMealsModalProps) {
-  const [favorites, setFavorites] = useState<MealEntry[]>([]);
-
-  // Load favorites from localStorage
-  useEffect(() => {
-    try {
-      const savedFavorites = localStorage.getItem('favorite_meals');
-      if (savedFavorites) {
-        setFavorites(JSON.parse(savedFavorites));
-      }
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-    }
-  }, []);
-
-  // Save favorites to localStorage
-  const saveFavorites = (newFavorites: MealEntry[]) => {
-    localStorage.setItem('favorite_meals', JSON.stringify(newFavorites));
-    setFavorites(newFavorites);
-  };
-
-  const handleToggleFavorite = (meal: MealEntry) => {
-    const isFavorite = favorites.some(fav => fav.id === meal.id);
-    if (isFavorite) {
-      // Remove from favorites
-      saveFavorites(favorites.filter(fav => fav.id !== meal.id));
-    } else {
-      // Add to favorites
-      saveFavorites([...favorites, meal]);
-    }
-  };
-
-  const isMealFavorite = (id: string) => favorites.some(fav => fav.id === id);
+  const { toggleFavorite, isMealFavorite } = useFavorites();
 
   // In history view, we don't want to allow meal deletion
   const handleDelete = () => {
@@ -84,7 +54,7 @@ export default function DayMealsModal({ isOpen, onClose, date, meals }: DayMeals
               description={meal.description}
               items={meal.items}
               isFavorite={isMealFavorite(meal.id)}
-              onToggleFavorite={() => handleToggleFavorite(meal)}
+              onToggleFavorite={() => toggleFavorite(meal)}
               onDelete={handleDelete}
             />
           ))}
