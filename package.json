@@ -14,7 +14,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run"
   },
-  "packageManager": "pnpm@11.15.1",
+  "packageManager": "pnpm@11.16.0",
   "dependencies": {
     "@vercel/analytics": "^2.0.0",
     "axios": "^1.18.1",
