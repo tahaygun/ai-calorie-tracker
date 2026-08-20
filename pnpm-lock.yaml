@@ -25,7 +25,7 @@ importers:
         version: 5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.32.0)(next@16.3.1(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(postcss@8.5.20)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.32.0)(postcss@8.5.23))
       openai:
         specifier: ^7.0.0
-        version: 7.4.0(zod@4.4.3)
+        version: 7.5.0(zod@4.4.3)
       react:
         specifier: ^19.2.7
         version: 19.2.8
@@ -2192,6 +2192,7 @@ packages:
   eslint@9.39.5:
     resolution: {integrity: sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -3023,8 +3024,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@7.4.0:
-    resolution: {integrity: sha512-+C9Muit5x8j9R8ej8ZzVgKcrVDtqFqTy9gxFdov0EItLgU68zrJtF9ZeT0cyqJQW9S3PCJkdFgADtRGquRBtew==}
+  openai@7.5.0:
+    resolution: {integrity: sha512-ZbDBz8FSB8Mv8fFYIUvzTFMdV5vl93/octp1MdtK2lfYepSpfv/ewmeugpKz/cwGtFSx+YuUM4NwpZ2P55YiPA==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
@@ -7038,7 +7039,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@7.4.0(zod@4.4.3):
+  openai@7.5.0(zod@4.4.3):
     optionalDependencies:
       zod: 4.4.3
 
