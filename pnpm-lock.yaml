@@ -65,7 +65,7 @@ importers:
         version: 19.2.4(@types/react@19.2.18)
       '@vitejs/plugin-react':
         specifier: ^6.0.4
-        version: 6.0.5(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0))
+        version: 6.1.0(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0))
       eslint:
         specifier: ^9.20.0
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
@@ -1534,17 +1534,20 @@ packages:
       vue-router:
         optional: true
 
-  '@vitejs/plugin-react@6.0.5':
-    resolution: {integrity: sha512-BOVzne/NL162sMdResB25mUv+vWMF5NoAjNf09TeGlE7ZpszZWSD3winycicLJw72yeVsoCn/2kOhEuCvEShMA==}
+  '@vitejs/plugin-react@6.1.0':
+    resolution: {integrity: sha512-qd2BzUBehkov86WFhg0JkEFEYyCLG9uPCe6qWTY/kRlss9OvJrOF2UbIWT7p+8IzZHkEu0DNGHc4HSv+JdDLsw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0
       babel-plugin-react-compiler: ^1.0.0
+      oxc-transform-react: ^0.145.0
       vite: ^8.0.0
     peerDependenciesMeta:
       '@rolldown/plugin-babel':
         optional: true
       babel-plugin-react-compiler:
+        optional: true
+      oxc-transform-react:
         optional: true
 
   '@vitest/expect@4.1.11':
@@ -2061,9 +2064,6 @@ packages:
   es-iterator-helpers@1.4.0:
     resolution: {integrity: sha512-c/A0P0oxkACDc+cKWw8evLXK83oBKgn0qPOqCYT4x9uolpCIJAcYvJC9QYKNDRPsTeGyCrQ326jrvgZWdCdK5Q==}
     engines: {node: '>= 0.4'}
-
-  es-module-lexer@2.3.1:
-    resolution: {integrity: sha512-shc1dbU90Yl/xq1QrC7QRtfcwURZuVRfPhZbDoldJ1cn1gzDvBaBWlv0eFolj5+0znnPJz5TXLxsN77X/12KTA==}
 
   es-module-lexer@2.3.2:
     resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
@@ -5371,7 +5371,7 @@ snapshots:
       next: 16.3.1(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react: 19.2.8
 
-  '@vitejs/plugin-react@6.0.5(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0))':
+  '@vitejs/plugin-react@6.1.0(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.1.5(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0)
@@ -6011,8 +6011,6 @@ snapshots:
       internal-slot: 1.1.0
       iterator.prototype: 1.1.5
       math-intrinsics: 1.1.0
-
-  es-module-lexer@2.3.1: {}
 
   es-module-lexer@2.3.2: {}
 
@@ -7821,7 +7819,7 @@ snapshots:
       browserslist: 4.28.6
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.24.2
-      es-module-lexer: 2.3.1
+      es-module-lexer: 2.3.2
       eslint-scope: 5.1.1
       events: 3.3.0
       graceful-fs: 4.2.11
