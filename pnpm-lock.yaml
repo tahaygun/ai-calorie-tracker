@@ -183,7 +183,7 @@ importers:
         version: 5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.32.0)(next@16.4.2(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(postcss@8.5.23)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.32.0)(postcss@8.5.23))
       openai:
         specifier: ^7.0.0
-        version: 7.42.0(undici@8.12.2)(zod@4.4.3)
+        version: 7.43.0(undici@8.12.2)(zod@4.4.3)
       react:
         specifier: ^19.2.7
         version: 19.3.1
@@ -3173,8 +3173,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openai@7.42.0:
-    resolution: {integrity: sha512-RziM2bxp1k24mTLtunije+OOCGRC+qtK0YNYPWkrTdKJLJ65WYW+rPYxlLbnBzU4WwINFCFa0OjCgbsX+fif/w==}
+  openai@7.43.0:
+    resolution: {integrity: sha512-fBjKaDFG8AVfkGYoIo/E+xNRlNk7nx2nQ9GoQtXfePzPjg4QcT6nejkhXayJnEwSpFGfthOrAPI2KXj5yAqg9A==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
@@ -7148,7 +7148,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@7.42.0(undici@8.12.2)(zod@4.4.3):
+  openai@7.43.0(undici@8.12.2)(zod@4.4.3):
     optionalDependencies:
       undici: 8.12.2
       zod: 4.4.3
