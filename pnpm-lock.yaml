@@ -187,7 +187,7 @@ importers:
     dependencies:
       '@vercel/analytics':
         specifier: ^2.0.0
-        version: 2.0.1(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
+        version: 2.0.1(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       axios:
         specifier: ^1.18.1
         version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -196,10 +196,10 @@ importers:
         version: 4.6.2
       next:
         specifier: 16.4.6
-        version: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next-pwa:
         specifier: ^5.6.0
-        version: 5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.33.0)(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(postcss@8.5.23)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
+        version: 5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.33.0)(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(postcss@8.5.23)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
       openai:
         specifier: ^7.0.0
         version: 7.63.0(undici@8.12.4)(zod@4.4.3)
@@ -224,7 +224,7 @@ importers:
         version: 4.3.5
       '@testing-library/jest-dom':
         specifier: ^8.0.0
-        version: 8.0.0(@testing-library/dom@10.4.1)(vitest@5.1.1(@types/node@26.6.6)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)))
+        version: 8.0.0(@testing-library/dom@10.4.1)(vitest@5.1.1(@types/node@26.6.7)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)))
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -233,7 +233,7 @@ importers:
         version: 14.6.13(@testing-library/dom@10.4.1)
       '@types/node':
         specifier: ^26.0.0
-        version: 26.6.6
+        version: 26.6.7
       '@types/react':
         specifier: ^19.2.17
         version: 19.3.0
@@ -242,7 +242,7 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^6.0.4
-        version: 6.3.0(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))
+        version: 6.3.0(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))
       eslint:
         specifier: ^9.20.0
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
@@ -260,7 +260,7 @@ importers:
         version: 3.10.1
       sharp:
         specifier: ^0.35.0
-        version: 0.35.5(@types/node@26.6.6)
+        version: 0.35.5(@types/node@26.6.7)
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.5
@@ -269,7 +269,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^5.0.0
-        version: 5.1.1(@types/node@26.6.6)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))
+        version: 5.1.1(@types/node@26.6.7)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))
 
 packages:
 
@@ -1434,8 +1434,8 @@ packages:
     resolution: {integrity: sha512-zmPitbQ8+6zNutpwgcQuLcsEpn/Cj54Kbn7L5pX0Os5kdWplB7xPgEh/g+SWOB/qmows2gpuCaPyduq8ZZRnxA==}
     deprecated: This is a stub types definition. minimatch provides its own type definitions, so you do not need this installed.
 
-  '@types/node@26.6.6':
-    resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
+  '@types/node@26.6.7':
+    resolution: {integrity: sha512-tovuRfrUILu6v46bMG+BgXxMvsqPBx2WO2as8Rpln+JTff1dbexMtAM4KFTejmL0axsnSWViCW7MecUQpLuBRA==}
 
   '@types/react-dom@19.3.0':
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
@@ -5193,7 +5193,7 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@8.0.0(@testing-library/dom@10.4.1)(vitest@5.1.1(@types/node@26.6.6)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)))':
+  '@testing-library/jest-dom@8.0.0(@testing-library/dom@10.4.1)(vitest@5.1.1(@types/node@26.6.7)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)))':
     dependencies:
       '@adobe/css-tools': 4.5.0
       '@testing-library/dom': 10.4.1
@@ -5203,7 +5203,7 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
     optionalDependencies:
-      vitest: 5.1.1(@types/node@26.6.6)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))
+      vitest: 5.1.1(@types/node@26.6.7)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))
 
   '@testing-library/react@16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
@@ -5240,7 +5240,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
 
   '@types/json-schema@7.0.15': {}
 
@@ -5250,7 +5250,7 @@ snapshots:
     dependencies:
       minimatch: 10.2.5
 
-  '@types/node@26.6.6':
+  '@types/node@26.6.7':
     dependencies:
       undici-types: 8.9.0
 
@@ -5264,7 +5264,7 @@ snapshots:
 
   '@types/resolve@1.17.1':
     dependencies:
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
 
   '@types/trusted-types@2.0.7': {}
 
@@ -5429,24 +5429,24 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@vercel/analytics@2.0.1(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)':
+  '@vercel/analytics@2.0.1(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)':
     optionalDependencies:
-      next: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      next: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
 
-  '@vitejs/plugin-react@6.3.0(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))':
+  '@vitejs/plugin-react@6.3.0(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)
+      vite: 8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)
 
-  '@vitest/mocker@5.1.1(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))':
+  '@vitest/mocker@5.1.1(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.1.1
       estree-walker: 3.0.3
       magic-string: 1.4.5
     optionalDependencies:
-      vite: 8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)
+      vite: 8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)
 
   '@vitest/spy@5.1.1': {}
 
@@ -6727,13 +6727,13 @@ snapshots:
 
   jest-worker@26.6.2:
     dependencies:
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
       merge-stream: 2.0.0
       supports-color: 7.2.0
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -6973,12 +6973,12 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-pwa@5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.33.0)(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(postcss@8.5.23)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23)):
+  next-pwa@5.6.0(@babel/core@7.29.7(supports-color@8.1.1))(lightningcss@1.33.0)(next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(postcss@8.5.23)(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23)):
     dependencies:
       babel-loader: 8.4.1(@babel/core@7.29.7(supports-color@8.1.1))(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
       clean-webpack-plugin: 4.0.0(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
       globby: 11.1.0
-      next: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      next: 16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       terser-webpack-plugin: 5.6.1(lightningcss@1.33.0)(postcss@8.5.23)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
       workbox-webpack-plugin: 6.6.0(supports-color@8.1.1)(webpack@5.108.4(lightningcss@1.33.0)(postcss@8.5.23))
       workbox-window: 6.6.0
@@ -7000,7 +7000,7 @@ snapshots:
       - uglify-js
       - webpack
 
-  next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  next@16.4.6(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.7)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       '@next/env': 16.4.6
       '@swc/helpers': 0.5.23
@@ -7019,7 +7019,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.4.6
       '@next/swc-win32-arm64-msvc': 16.4.6
       '@next/swc-win32-x64-msvc': 16.4.6
-      sharp: 0.35.5(@types/node@26.6.6)
+      sharp: 0.35.5(@types/node@26.6.7)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -7409,7 +7409,7 @@ snapshots:
       es-errors: 1.3.0
       es-object-atoms: 1.1.2
 
-  sharp@0.35.5(@types/node@26.6.6):
+  sharp@0.35.5(@types/node@26.6.7):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -7440,7 +7440,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.5
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
 
   shebang-command@2.0.0:
     dependencies:
@@ -7782,7 +7782,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0):
+  vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -7790,15 +7790,15 @@ snapshots:
       rolldown: 1.1.5
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
       fsevents: 2.3.3
       jiti: 2.7.0
       terser: 5.49.0
 
-  vitest@5.1.1(@types/node@26.6.6)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)):
+  vitest@5.1.1(@types/node@26.6.7)(jsdom@31.0.1)(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.1.1(vite@8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0))
+      '@vitest/mocker': 5.1.1(vite@8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0))
       chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -7809,10 +7809,10 @@ snapshots:
       tinybench: 6.2.4
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
-      vite: 8.1.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.49.0)
+      vite: 8.1.5(@types/node@26.6.7)(jiti@2.7.0)(terser@5.49.0)
       why-is-node-running: 3.2.1
     optionalDependencies:
-      '@types/node': 26.6.6
+      '@types/node': 26.6.7
       jsdom: 31.0.1
     transitivePeerDependencies:
       - msw
